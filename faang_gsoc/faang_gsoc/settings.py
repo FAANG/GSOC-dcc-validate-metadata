@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'channels',
     'ws',
+    'graphql_ws.django',
+    'graphene_django',
+    'graphql_api',
     'nextflow_upload',
     'conversion',
     'validation'
@@ -57,6 +60,11 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = ['http://localhost:4200']
+
+GRAPHENE = {
+    "SCHEMA": "graphql_api.schema.schema"
+}
+
 
 ROOT_URLCONF = 'faang_gsoc.urls'
 
@@ -141,6 +149,8 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 
 ASGI_APPLICATION = 'faang_gsoc.routing.application'
+
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',

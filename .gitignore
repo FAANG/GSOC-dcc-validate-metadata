@@ -28,3 +28,4 @@ nytprof.out
 faang_gsoc/*/logs.log
 env
 faang_gsoc/k8sconfigs
+activate.bat
