@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-j201t-eu#6v1d_@nh1msnp7t9k7q@7+25-xbkn+0_9z+th$_a+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1','localhost']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'channels',
     'ws',
     'nextflow_upload',
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,6 +55,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = ['http://localhost:4200']
 
 ROOT_URLCONF = 'faang_gsoc.urls'
 
@@ -146,7 +150,8 @@ CHANNEL_LAYERS = {
     },
 }
 
-BOVREG_BIOSAMPLES_USERNAME_PROD = 'bovreg_bio_username'
+
+BOVREG_BIOSAMPLES_USERNAME_PROD = 'bovreg_bio_uname'
 BOVREG_USERNAME = 'bovreg_uname'
 BOVREG_PASSWORD = 'bovreg_pwd'
 BOVREG_BIOSAMPLES_USERNAME_TEST = 'bovreg_bio_uname_test'

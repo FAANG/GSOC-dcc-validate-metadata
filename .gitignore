@@ -27,3 +27,4 @@ nytprof.out
 .idea
 faang_gsoc/*/logs.log
 env
+faang_gsoc/k8sconfigs

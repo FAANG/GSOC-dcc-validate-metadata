@@ -1,6 +1,7 @@
 from decouple import config
 
-root_path = '/Users/yroochun/Projects/GSOC/faang_gsoc'
+# root_path = '/Users/yroochun/Projects/GSOC/faang_gsoc'
+root_path = 'C:/Users/sunny/OneDrive/Desktop/GSOC/GSOC-dcc-validate-metadata'
 
 BASE_URL = "https://raw.githubusercontent.com/FAANG/dcc-metadata/abc-97/json_schema/"
 
