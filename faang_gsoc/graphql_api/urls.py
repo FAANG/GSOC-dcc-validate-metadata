@@ -5,5 +5,5 @@ from decouple import config
 DEBUG = config('DEBUG',default=False)
 
 urlpatterns = [
-    path("graphql", GraphQLView.as_view(graphiql=DEBUG)),
+    path("", GraphQLView.as_view(graphiql=DEBUG)),
 ]
