@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'channels',
     'ws',
+    'rest_framework',
+    'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl_drf',
     'graphql_ws.django',
     'graphene_django',
     'graphql_api',
@@ -63,6 +66,14 @@ CORS_ALLOWED_ORIGINS = ['http://localhost:4200']
 
 GRAPHENE = {
     "SCHEMA": "graphql_api.schema.schema"
+}
+
+print(f'{config("NODE",default="localhost")}:{config("PORT",default="9200")}')
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': f'{config("NODE",default="localhost")}:{config("PORT",default="9200")}'
+    },
 }
 
 
