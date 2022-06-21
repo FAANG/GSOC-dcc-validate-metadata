@@ -2,7 +2,9 @@ from graphene import Schema, String,relay
 from .tasks import graphql_task
 from .grapheneObjects.helpers import resolve_all
 from .grapheneObjects.organism.schema import OrganismSchema
-class Query(OrganismSchema):
+from .grapheneObjects.analysis.schema import AnalysisSchema
+from .grapheneObjects.experiment.schema import ExperimentSchema
+class Query(OrganismSchema,ExperimentSchema, AnalysisSchema):
     hello = String()
     node = relay.Node.Field()
 
