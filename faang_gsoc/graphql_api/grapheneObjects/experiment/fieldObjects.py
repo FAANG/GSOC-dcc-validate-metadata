@@ -1,4 +1,4 @@
-from graphene import Field, ObjectType, String
+from graphene import Field, ObjectType, String, relay
 
 class SamplingToPreparationInterval_Field(ObjectType):
     text = String()
@@ -110,3 +110,6 @@ class CAGE_seq_Field(ObjectType):
     rnaPurity260280ratio = String()
     rnaPurity260230ratio = String()
     rnaIntegrityNumber = String()
+
+class ExperimentJoinField(ObjectType):
+    analysis = relay.ConnectionField('graphql_api.grapheneObjects.analysis.schema.AnalysisConnection')

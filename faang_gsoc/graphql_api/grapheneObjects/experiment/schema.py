@@ -1,10 +1,10 @@
-from graphene import ObjectType, String, Field,ID, relay, List, Int
+from graphene import ObjectType, String, Field,ID, relay, List
 from graphene.relay import Connection,Node
 
 from .dataloader import ExperimentLoader
 
-from ..helpers import resolve_all, resolve_single_document
-from .fieldObjects import BS_seq_Field,CAGE_seq_Field,ChIP_seq_DNA_binding_Field,ChIP_seq_input_DNA_Field,ATAC_seq_Field,CustomField_Field,DNase_seq_Field,ExperimentalProtocol_Field,ExtractionProtocol_Field,Hi_C_Field,LibraryPreparationDate_Field,LibraryPreparationLocationLatitude_Field,LibraryPreparationLocationLongitude_Field,RNA_seq_Field,SamplingToPreparationInterval_Field,SequencingDate_Field,SequencingLocationLatitude_Field,SequencingLocationLongitude_Field,WGS_Field
+from ..helpers import resolve_single_document, resolve_with_join
+from .fieldObjects import BS_seq_Field,CAGE_seq_Field,ChIP_seq_DNA_binding_Field,ChIP_seq_input_DNA_Field,ATAC_seq_Field,CustomField_Field,DNase_seq_Field, ExperimentJoinField,ExperimentalProtocol_Field,ExtractionProtocol_Field,Hi_C_Field,LibraryPreparationDate_Field,LibraryPreparationLocationLatitude_Field,LibraryPreparationLocationLongitude_Field,RNA_seq_Field,SamplingToPreparationInterval_Field,SequencingDate_Field,SequencingLocationLatitude_Field,SequencingLocationLongitude_Field,WGS_Field
 def resolve_single_experiment(args):
     q = ''
 
@@ -67,7 +67,7 @@ class ExperimentNode(ObjectType):
     RNA_seq = Field(RNA_seq_Field)
     WGS = Field(WGS_Field)
     CAGE_seq = Field(CAGE_seq_Field)  
-    
+    join = Field(ExperimentJoinField)
     
     @classmethod
     def get_node(cls, info, id):
@@ -94,7 +94,18 @@ class ExperimentSchema(ObjectType):
         return resolve_single_experiment(args)
 
     def resolve_all_experiments(root, info):
-        return resolve_all('experiment')
+        # return resolve_all('analysis') 
+        filterObj = {
+            'join':{
+            'analysis':{
+                'basic':{
+                        'accession':"ERX5463479"
+                    }
+                }
+            }
+        }
+        res = resolve_with_join(filterObj,'experiment')
+        return res
 
     # just an example of relay.connection field and batch loader
     def resolve_some_experiments(root,info,**args):

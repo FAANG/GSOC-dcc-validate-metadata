@@ -1,10 +1,10 @@
-from graphene import ObjectType, String, Field,ID, relay, List, Int
+from graphene import ObjectType, String, Field,ID, relay, List
 from graphene.relay import Connection,Node
 
 from .dataloader import AnalysisLoader
 
-from ..helpers import resolve_all, resolve_single_document
-from .fieldObjects import AnalysisDateField, AnalysisProtocolField,FilesField,AnalysisOrganismField
+from ..helpers import resolve_all, resolve_single_document, resolve_with_join
+from .fieldObjects import AnalysisDateField, AnalysisJoinField, AnalysisProtocolField,FilesField,AnalysisOrganismField
 
 def resolve_single_analysis(args):
     q = ''
@@ -55,7 +55,8 @@ class AnalysisNode(ObjectType):
     program = String()
     platform = String()
     imputation = String()
-
+    join = Field(AnalysisJoinField)
+    
     @classmethod
     def get_node(cls, info, id):
         args = {'id':id}
@@ -81,7 +82,18 @@ class AnalysisSchema(ObjectType):
         return resolve_single_analysis(args)
 
     def resolve_all_analysis(root, info):
-        return resolve_all('analysis')
+        # return resolve_all('analysis') 
+        filterObj = {
+            'join':{
+            'experiment':{
+                'basic':{
+                        'accession':"ERX5463479"
+                    }
+                }
+            }
+        }
+        res = resolve_with_join(filterObj,'analysis')
+        return res
 
     # just an example of relay.connection field and batch loader
     def resolve_some_analysis(root,info,**args):

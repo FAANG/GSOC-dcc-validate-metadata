@@ -1,5 +1,4 @@
-from graphene import ObjectType, String
-
+from graphene import ObjectType, String, relay
 class FilesField(ObjectType):
     name = String()
     url = String()
@@ -20,3 +19,6 @@ class AnalysisProtocolField(ObjectType):
 class AnalysisOrganismField(ObjectType):
     text = String()
     ontologyTerms = String()
+
+class AnalysisJoinField(ObjectType):
+    experiment = relay.ConnectionField('graphql_api.grapheneObjects.experiment.schema.ExperimentConnection')
