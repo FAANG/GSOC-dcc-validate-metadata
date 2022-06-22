@@ -1,3 +1,5 @@
+MAX_FILTER_QUERY_DEPTH = 3
+
 ANALYSIS  = 'analysis'
 EXPERIMENT = 'experiment'
 

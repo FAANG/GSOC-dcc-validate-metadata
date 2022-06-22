@@ -88,6 +88,18 @@ class AnalysisSchema(ObjectType):
             'experiment':{
                 'basic':{
                         'accession':"ERX5463479"
+                    },
+                    'join':{
+                        'analysis':{
+                            'basic':{
+                                'accession':"E"
+                            },
+                            # 'join':{
+                            #     'experiment':{
+                            #         'basic':{'accession':'A'}
+                            #     }
+                            # }
+                        }
                     }
                 }
             }

@@ -3,12 +3,22 @@ from decouple import config
 from collections import defaultdict
 import json
 
-from .constants import FAANG_dataset_index_relations
+from .constants import MAX_FILTER_QUERY_DEPTH, FAANG_dataset_index_relations
 
 es = Elasticsearch(hosts=[{"host":config("NODE",default="localhost")}])
 
- 
+def check_filter_query_depth(filter,current_depth):
+    if current_depth > MAX_FILTER_QUERY_DEPTH:
+        return False
+    if not 'join' in filter:
+        return True
+
+    for next_index in list(filter['join']):
+        is_valid = check_filter_query_depth(filter['join'][next_index],current_depth+1)
+        if not is_valid: return False
+    return True
 def get_projected_data(parent_index,child_index,parent_index_data,child_index_data):
+    
     
     res = []
     
@@ -21,6 +31,7 @@ def get_projected_data(parent_index,child_index,parent_index_data,child_index_da
                     parent['join'][child_index].append(child_index_map[child_index_key])
             if parent['join']:
                 res.append(parent)
+            # res.append(parent)
     
     if FAANG_dataset_index_relations[(parent_index,child_index)]['type'] == 3:
         child_index_map = defaultdict(list)
@@ -35,10 +46,13 @@ def get_projected_data(parent_index,child_index,parent_index_data,child_index_da
                 parent['join'][child_index] = child_index_map[parent[FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key']]]
             if parent['join']:
                 res.append(parent)
-
+            # res.append(parent)
     return res
 def resolve_with_join(filter,current_index):
-    print(filter)
+
+    print(check_filter_query_depth(filter,1))
+
+
     if not bool(filter):
         return resolve_all(current_index)
 
@@ -50,10 +64,10 @@ def resolve_with_join(filter,current_index):
         return current_index_data
 
     for next_index in list(filter['join']):
-        next_index_data = resolve_with_join(filter['join'],next_index)
+        next_index_data = resolve_with_join(filter['join'][next_index],next_index)
         current_index_data = get_projected_data(current_index,next_index,current_index_data,next_index_data)
     
-    print(json.dumps(current_index_data,indent=4))
+    # print(json.dumps(current_index_data,indent=4))
     return current_index_data
         
 
