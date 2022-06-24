@@ -17,6 +17,26 @@ def check_filter_query_depth(filter,current_depth):
         is_valid = check_filter_query_depth(filter['join'][next_index],current_depth+1)
         if not is_valid: return False
     return True
+
+# takes a nested dict and flattens its keys
+# example:
+# filter_basic_query = {
+#     'organism':{
+#         'sex':{
+#             'text': ['female']
+#         }
+#     }
+# }
+# will be converted to ->
+# sanitized_query = {'organism.sex.text':['female']}
+def sanitize_filter_basic_query(filter_basic_query,sanitized_query,prefix=''):
+
+    for key in list(filter_basic_query):
+        sanitized_key = prefix + '.' + key if prefix else key
+        if isinstance(filter_basic_query[key],dict):
+            sanitize_filter_basic_query(filter_basic_query[key],sanitized_query,sanitized_key)
+        else:        
+            sanitized_query[sanitized_key] = filter_basic_query[key]
 def get_projected_data(parent_index,child_index,parent_index_data,child_index_data):
     
     
@@ -49,15 +69,20 @@ def get_projected_data(parent_index,child_index,parent_index_data,child_index_da
             # res.append(parent)
     return res
 def resolve_with_join(filter,current_index):
-
-    print(check_filter_query_depth(filter,1))
+    # print(check_filter_query_depth(filter,1))
 
 
     if not bool(filter):
         return resolve_all(current_index)
 
 #  with basic filters
+    sanitized_basic_filter = {}
+
+    if 'basic' in filter:
+        sanitize_filter_basic_query(filter['basic'],sanitized_basic_filter)
+        # print(sanitized_basic_filter)
     
+    # filter_query = {"accession":['ERZ10183149'.lower(), 'ERZ10183092'.lower()]}
     current_index_data = resolve_all(current_index)
     
     if not bool(current_index_data) or not 'join' in filter:
@@ -71,13 +96,33 @@ def resolve_with_join(filter,current_index):
     return current_index_data
         
 
-def resolve_all(index_name):
-    res = [x['_source'] for x in es.search(index = index_name,filter_path = ['hits.hits._source'],body = {
-            'size' : 10000,
-            'query': {
+def resolve_all(index_name,**kwargs):
+    filter_query = kwargs['filter'] if 'filter' in kwargs else {}
+    # print(filter_query)
+    query = {}
+    if filter_query:
+        query = {
+            "bool" : {
+                        "filter" : {
+                            # "terms" : {
+                            #     # filter terms only works if values are lowercase
+                            #     # key_name : [key.lower() for key in keys]
+                            # }
+                            "terms" : filter_query
+                        }
+                    }
+            }
+    else:
+        query = {
                 'match_all' : {}
             }
-        })['hits']['hits']]
+
+    fetched_data = es.search(index = index_name,filter_path = ['hits.hits._source'],body = {
+            'size' : 10000,
+            'query': query
+        })
+
+    res = [x['_source'] for x in fetched_data['hits']['hits']] if fetched_data else []
 
     return res
 

@@ -1,61 +1,61 @@
 from graphene import ObjectType, String
 
-class OrganizationField(ObjectType):
+class Organization_Field(ObjectType):
     name = String()
     role = String()
     URL = String()
 
-class CustomFieldField(ObjectType):
+class OrganismCustomField_Field(ObjectType):
     name = String()
     value = String()
     unit = String()
     ontologyTerms = String()
 
-class MaterialField(ObjectType):
+class Material_Field(ObjectType):
     text = String()
     ontologyTerms = String()
 
-class OrganismField(ObjectType):
+class Organism_Field(ObjectType):
     text = String()
     ontologyTerms = String()
 
-class SexField(ObjectType):
+class Sex_Field(ObjectType):
     text = String()
     ontologyTerms = String()
 
-class BreedField(ObjectType):
+class Breed_Field(ObjectType):
     text = String()
     ontologyTerms = String()
 
-class BirthDateField(ObjectType):
+class BirthDate_Field(ObjectType):
     text = String()
     unit = String()
 
-class HealthStatusField(ObjectType):
+class HealthStatus_Field(ObjectType):
     text = String()
     ontologyTerms = String()
 
-class BirthLocationLongitudeField(ObjectType):
+class BirthLocationLongitude_Field(ObjectType):
     text = String()
     unit = String()
 
-class BirthLocationLatitudeField(ObjectType):
+class BirthLocationLatitude_Field(ObjectType):
     text = String()
     unit = String()
 
-class BirthWeightField(ObjectType):
+class BirthWeight_Field(ObjectType):
     text = String()
     unit = String()
 
-class PlacentalWeightField(ObjectType):
+class PlacentalWeight_Field(ObjectType):
     text = String()
     unit = String()
 
-class PregnancyLengthField(ObjectType):
+class PregnancyLength_Field(ObjectType):
     text = String()
     unit = String()
 
-class PublishedArticlesField(ObjectType):
+class PublishedArticles_Field(ObjectType):
     articleId = String()
     title = String()
     year = String()

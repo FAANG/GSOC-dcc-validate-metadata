@@ -1,11 +1,11 @@
-from graphene import ObjectType, String, Field,ID, relay, List
+from graphene import InputObjectType, ObjectType, String, Field,ID, relay, List
 from graphene.relay import Connection,Node
 
 from .dataloader import AnalysisLoader
 
 from ..helpers import resolve_all, resolve_single_document, resolve_with_join
-from .fieldObjects import AnalysisDateField, AnalysisJoinField, AnalysisProtocolField,FilesField,AnalysisOrganismField
-
+from .fieldObjects import AnalysisDate_Field, AnalysisJoin_Field, AnalysisProtocol_Field,Files_Field,AnalysisOrganism_Field
+from .arguments.filter import AnalysisFilter_Argument
 def resolve_single_analysis(args):
     q = ''
 
@@ -35,7 +35,7 @@ class AnalysisNode(ObjectType):
     versionLastStandardMet = String()
     releaseDate = String()
     updateDate = String()
-    organism = Field(AnalysisOrganismField)
+    organism = Field(AnalysisOrganism_Field)
     type = String()
     datasetAccession = String()
     datasetInPortal = String()
@@ -43,10 +43,10 @@ class AnalysisNode(ObjectType):
     experimentAccessions = String()
     runAccessions = String()
     analysisAccessions = String()
-    files = Field(FilesField)
-    analysisDate = Field(AnalysisDateField)
+    files = Field(Files_Field)
+    analysisDate = Field(AnalysisDate_Field)
     assayType = String()
-    analysisProtocol = Field(AnalysisProtocolField)
+    analysisProtocol = Field(AnalysisProtocol_Field)
     analysisType = String()
     referenceGenome = String()
     analysisCenter = String()
@@ -55,7 +55,7 @@ class AnalysisNode(ObjectType):
     program = String()
     platform = String()
     imputation = String()
-    join = Field(AnalysisJoinField)
+    join = Field(AnalysisJoin_Field)
     
     @classmethod
     def get_node(cls, info, id):
@@ -71,9 +71,16 @@ class AnalysisConnection(Connection):
 
 analysisLoader = AnalysisLoader()
 
+class Secondary(InputObjectType):
+    a =String()
+    b =String()
+class MyInputObjectType(InputObjectType):
+    name = String()
+    h = Field(Secondary)
 class AnalysisSchema(ObjectType):
     analysis = Field(AnalysisNode,id = ID(required=True), alternate_id = ID(required = False))
-    all_analysis = relay.ConnectionField(AnalysisConnection)
+    # all_analysis = relay.ConnectionField(AnalysisConnection,filter=MyInputObjectType())
+    all_analysis = relay.ConnectionField(AnalysisConnection,filter=AnalysisFilter_Argument())
 
     # just an example of relay.connection field and batch loader
     some_analysis = relay.ConnectionField(AnalysisConnection,ids = List(of_type=String, required=True))
@@ -81,30 +88,9 @@ class AnalysisSchema(ObjectType):
     def resolve_analysis(root,info,**args):
         return resolve_single_analysis(args)
 
-    def resolve_all_analysis(root, info):
-        # return resolve_all('analysis') 
-        filterObj = {
-            'join':{
-            'experiment':{
-                'basic':{
-                        'accession':"ERX5463479"
-                    },
-                    'join':{
-                        'analysis':{
-                            'basic':{
-                                'accession':"E"
-                            },
-                            # 'join':{
-                            #     'experiment':{
-                            #         'basic':{'accession':'A'}
-                            #     }
-                            # }
-                        }
-                    }
-                }
-            }
-        }
-        res = resolve_with_join(filterObj,'analysis')
+    def resolve_all_analysis(root, info,**kwargs):
+        filter_query = kwargs['filter'] if 'filter' in kwargs else {}
+        res = resolve_with_join(filter_query,'analysis')
         return res
 
     # just an example of relay.connection field and batch loader

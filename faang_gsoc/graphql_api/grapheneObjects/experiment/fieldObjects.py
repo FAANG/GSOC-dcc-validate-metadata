@@ -37,7 +37,7 @@ class SequencingDate_Field(ObjectType):
     text = String()
     unit = String()
 
-class CustomField_Field(ObjectType):
+class ExperimentCustomField_Field(ObjectType):
     name = String()
     value = String()
     unit = String()

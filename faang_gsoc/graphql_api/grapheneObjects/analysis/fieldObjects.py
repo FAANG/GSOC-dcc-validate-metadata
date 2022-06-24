@@ -1,5 +1,5 @@
 from graphene import ObjectType, String, relay
-class FilesField(ObjectType):
+class Files_Field(ObjectType):
     name = String()
     url = String()
     type = String()
@@ -8,17 +8,17 @@ class FilesField(ObjectType):
     checksum = String()
 
 
-class AnalysisDateField(ObjectType):
+class AnalysisDate_Field(ObjectType):
     text = String()
     unit = String()
 
-class AnalysisProtocolField(ObjectType):
+class AnalysisProtocol_Field(ObjectType):
     url = String()
     filename = String()
 
-class AnalysisOrganismField(ObjectType):
+class AnalysisOrganism_Field(ObjectType):
     text = String()
     ontologyTerms = String()
 
-class AnalysisJoinField(ObjectType):
+class AnalysisJoin_Field(ObjectType):
     experiment = relay.ConnectionField('graphql_api.grapheneObjects.experiment.schema.ExperimentConnection')

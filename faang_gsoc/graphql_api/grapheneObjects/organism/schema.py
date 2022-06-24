@@ -4,8 +4,8 @@ from graphene.relay import Connection,Node
 from .dataloader import OrganismLoader
 
 from ..helpers import resolve_all, resolve_single_document
-from .fieldObjects import OrganismField,CustomFieldField,BirthDateField,BirthLocationLatitudeField,BirthLocationLongitudeField,BirthWeightField,BreedField,HealthStatusField,MaterialField,OrganizationField,PlacentalWeightField,PregnancyLengthField,PublishedArticlesField,SexField
-
+from .fieldObjects import Organism_Field,OrganismCustomField_Field,BirthDate_Field,BirthLocationLatitude_Field,BirthLocationLongitude_Field,BirthWeight_Field,Breed_Field,HealthStatus_Field,Material_Field,Organization_Field,PlacentalWeight_Field,PregnancyLength_Field,PublishedArticles_Field,Sex_Field
+from .arguments.filter import OrganismFilter_Argument
 def resolve_single_organism(args):
     q = ''
 
@@ -37,27 +37,27 @@ class OrganismNode(ObjectType):
     versionLastStandardMet = String()
     project = String()
     secondaryProject = String()
-    organization = Field(OrganizationField)
-    customField = Field(CustomFieldField)
-    material = Field(MaterialField)
+    organization = Field(Organization_Field)
+    customField = Field(OrganismCustomField_Field)
+    material = Field(Material_Field)
     availability = String()
-    organism = Field(OrganismField)
-    sex = Field(SexField)
-    breed = Field(BreedField)
-    birthDate = Field(BirthDateField)
-    healthStatus = Field(HealthStatusField)
+    organism = Field(Organism_Field)
+    sex = Field(Sex_Field)
+    breed = Field(Breed_Field)
+    birthDate = Field(BirthDate_Field)
+    healthStatus = Field(HealthStatus_Field)
     birthLocation = String()
-    birthLocationLongitude = Field(BirthLocationLongitudeField)
-    birthLocationLatitude = Field(BirthLocationLatitudeField)
-    birthWeight = Field(BirthWeightField)
-    placentalWeight = Field(PlacentalWeightField)
-    pregnancyLength = Field(PregnancyLengthField)
+    birthLocationLongitude = Field(BirthLocationLongitude_Field)
+    birthLocationLatitude = Field(BirthLocationLatitude_Field)
+    birthWeight = Field(BirthWeight_Field)
+    placentalWeight = Field(PlacentalWeight_Field)
+    pregnancyLength = Field(PregnancyLength_Field)
     deliveryTiming = String()
     deliveryEase = String()
     childOf = String()
     pedigree = String()
     paperPublished = String()
-    publishedArticles = Field(PublishedArticlesField)
+    publishedArticles = Field(PublishedArticles_Field)
     
     @classmethod
     def get_node(cls, info, id):
@@ -75,7 +75,7 @@ organismLoader = OrganismLoader()
 
 class OrganismSchema(ObjectType):
     organism = Field(OrganismNode,id = ID(required=True), alternate_id = ID(required = False))
-    all_organisms = relay.ConnectionField(OrganismConnection)
+    all_organisms = relay.ConnectionField(OrganismConnection, filter=OrganismFilter_Argument())
 
     # just an example of relay.connection field and batch loader
     some_organisms = relay.ConnectionField(OrganismConnection,ids = List(of_type=String, required=True))
