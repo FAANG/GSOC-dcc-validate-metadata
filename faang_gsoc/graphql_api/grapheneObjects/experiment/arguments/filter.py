@@ -1,4 +1,4 @@
-from graphene import Field, String, InputObjectType
+from graphene import Field, String, InputObjectType, List
 
 class SamplingToPreparationInterval_InputField(InputObjectType):
     text = String()
@@ -113,17 +113,17 @@ class CAGE_seq_InputField(InputObjectType):
 
 
 class ExperimentFilterBasic_Argument(InputObjectType):
-    accession = String()
-    accession = String()
-    project = String()
-    secondaryProject = String()
-    assayType = String()
-    experimentTarget = String()
-    standardMet = String()
-    versionLastStandardMet = String()
-    libraryName = String()
-    sampleStorage = String()
-    sampleStorageProcessing = String()
+    accession = List(String)
+    accession = List(String)
+    project = List(String)
+    secondaryProject = List(String)
+    assayType = List(String)
+    experimentTarget = List(String)
+    standardMet = List(String)
+    versionLastStandardMet = List(String)
+    libraryName = List(String)
+    sampleStorage = List(String)
+    sampleStorageProcessing = List(String)
 
     samplingToPreparationInterval = Field(SamplingToPreparationInterval_InputField)
     
@@ -131,7 +131,7 @@ class ExperimentFilterBasic_Argument(InputObjectType):
     extractionProtocol = Field(ExtractionProtocol_InputField)
 
 
-    libraryPreparationLocation = String()
+    libraryPreparationLocation = List(String)
 
     libraryPreparationLocationLatitude = Field(LibraryPreparationLocationLatitude_InputField)
     
@@ -139,7 +139,7 @@ class ExperimentFilterBasic_Argument(InputObjectType):
     
     libraryPreparationDate = Field(LibraryPreparationDate_InputField)
     
-    sequencingLocation = String()
+    sequencingLocation = List(String)
 
     sequencingLocationLongitude = Field(SequencingLocationLongitude_InputField)
     sequencingLocationLatitude = Field(SequencingLocationLatitude_InputField)

@@ -3,7 +3,7 @@ from decouple import config
 from collections import defaultdict
 import json
 
-from .constants import MAX_FILTER_QUERY_DEPTH, FAANG_dataset_index_relations
+from .constants import MAX_FILTER_QUERY_DEPTH, FAANG_dataset_index_relations, non_keyword_properties
 
 es = Elasticsearch(hosts=[{"host":config("NODE",default="localhost")}])
 
@@ -29,14 +29,16 @@ def check_filter_query_depth(filter,current_depth):
 # }
 # will be converted to ->
 # sanitized_query = {'organism.sex.text':['female']}
-def sanitize_filter_basic_query(filter_basic_query,sanitized_query,prefix=''):
+def sanitize_filter_basic_query(filter_basic_query,sanitized_filter_basic_queries,prefix=''):
 
     for key in list(filter_basic_query):
         sanitized_key = prefix + '.' + key if prefix else key
         if isinstance(filter_basic_query[key],dict):
-            sanitize_filter_basic_query(filter_basic_query[key],sanitized_query,sanitized_key)
-        else:        
-            sanitized_query[sanitized_key] = filter_basic_query[key]
+            sanitize_filter_basic_query(filter_basic_query[key],sanitized_filter_basic_queries,sanitized_key)
+        else:
+            if sanitized_key not in non_keyword_properties:
+                sanitized_key += '.keyword'
+            sanitized_filter_basic_queries.append({"terms":{sanitized_key : filter_basic_query[key]}})
 def get_projected_data(parent_index,child_index,parent_index_data,child_index_data):
     
     
@@ -76,14 +78,16 @@ def resolve_with_join(filter,current_index):
         return resolve_all(current_index)
 
 #  with basic filters
-    sanitized_basic_filter = {}
+    sanitized_basic_filter_queries = []
 
     if 'basic' in filter:
-        sanitize_filter_basic_query(filter['basic'],sanitized_basic_filter)
-        # print(sanitized_basic_filter)
+        sanitize_filter_basic_query(filter['basic'],sanitized_basic_filter_queries)
+        print(sanitized_basic_filter_queries)
     
-    # filter_query = {"accession":['ERZ10183149'.lower(), 'ERZ10183092'.lower()]}
-    current_index_data = resolve_all(current_index)
+    # filter_query = {"accession":['ERZ10183149', 'ERZ10183096', "ERX5463437","ERX5463438"]}
+    # filter_query = {}
+    # sanitize_filter_basic_query(filter_query,sanitized_basic_filter)
+    current_index_data = resolve_all(current_index,filter=sanitized_basic_filter_queries)
     
     if not bool(current_index_data) or not 'join' in filter:
         return current_index_data
@@ -91,25 +95,27 @@ def resolve_with_join(filter,current_index):
     for next_index in list(filter['join']):
         next_index_data = resolve_with_join(filter['join'][next_index],next_index)
         current_index_data = get_projected_data(current_index,next_index,current_index_data,next_index_data)
-    
-    # print(json.dumps(current_index_data,indent=4))
+    print(json.dumps(current_index_data,indent=4))
     return current_index_data
         
 
 def resolve_all(index_name,**kwargs):
-    filter_query = kwargs['filter'] if 'filter' in kwargs else {}
-    # print(filter_query)
+    filter_queries = kwargs['filter'] if 'filter' in kwargs else []
+    print(filter_queries)
+
     query = {}
-    if filter_query:
+    if filter_queries:
         query = {
             "bool" : {
-                        "filter" : {
-                            # "terms" : {
-                            #     # filter terms only works if values are lowercase
-                            #     # key_name : [key.lower() for key in keys]
-                            # }
-                            "terms" : filter_query
-                        }
+                        "filter": filter_queries
+                        # "filter" : [
+                        #     # "terms" : {
+                        #     #     # filter terms only works if values are lowercase
+                        #     #     # key_name : [key.lower() for key in keys]
+                        #     # }
+                        #    { "terms" : filter_query},
+                        # #    {"terms":{"accession.keyword":["ERZ10183153"]}}
+                        # ]
                     }
             }
     else:
@@ -121,9 +127,11 @@ def resolve_all(index_name,**kwargs):
             'size' : 10000,
             'query': query
         })
-
+    
     res = [x['_source'] for x in fetched_data['hits']['hits']] if fetched_data else []
-
+    print('resresres')
+    # print(json.dumps(res,indent=4))
+    # print(json.dumps(fetched_data['hits']['hits'],indent=4))
     return res
 
 def resolve_single_document(index_name,q, **kwargs):
