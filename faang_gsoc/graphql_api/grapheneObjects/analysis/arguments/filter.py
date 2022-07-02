@@ -1,5 +1,5 @@
 from graphene import InputObjectType, String, Field,List
-
+from ...commonInputFieldObject import Protocol_InputField
 class Files_InputField(InputObjectType):
     name = String()
     url = String()
@@ -12,10 +12,6 @@ class Files_InputField(InputObjectType):
 class AnalysisDate_InputField(InputObjectType):
     text = String()
     unit = String()
-
-class AnalysisProtocol_InputField(InputObjectType):
-    url = String()
-    filename = String()
 
 class AnalysisOrganism_InputField(InputObjectType):
     text = String()
@@ -43,7 +39,7 @@ class AnalysisFilterBasic_Argument(InputObjectType):
     files = Field(Files_InputField)
     analysisDate = Field(AnalysisDate_InputField)
     assayType = List(String)
-    analysisProtocol = Field(AnalysisProtocol_InputField)
+    analysisProtocol = Field(Protocol_InputField)
     analysisType = List(String)
     referenceGenome = List(String)
     analysisCenter = List(String)
@@ -56,7 +52,10 @@ class AnalysisFilterBasic_Argument(InputObjectType):
 
 class AnalysisFilterJoin_Argument(InputObjectType):
     experiment = Field('graphql_api.grapheneObjects.experiment.arguments.filter.ExperimentFilter_Argument')
-
+    article = Field('graphql_api.grapheneObjects.article.arguments.filter.ArticleFilter_Argument')
+    dataset = Field('graphql_api.grapheneObjects.dataset.arguments.filter.DatasetFilter_Argument')
+    specimen = Field('graphql_api.grapheneObjects.specimen.arguments.filter.SpecimenFilter_Argument')
+    
 
 class AnalysisFilter_Argument(InputObjectType):
     basic = Field(AnalysisFilterBasic_Argument)

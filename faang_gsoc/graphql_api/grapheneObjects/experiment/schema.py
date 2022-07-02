@@ -4,8 +4,9 @@ from graphene.relay import Connection,Node
 from .dataloader import ExperimentLoader
 
 from ..helpers import resolve_single_document, resolve_with_join
-from .fieldObjects import BS_seq_Field,CAGE_seq_Field,ChIP_seq_DNA_binding_Field,ChIP_seq_input_DNA_Field,ATAC_seq_Field,ExperimentCustomField_Field,DNase_seq_Field, ExperimentJoinField,ExperimentalProtocol_Field,ExtractionProtocol_Field,Hi_C_Field,LibraryPreparationDate_Field,LibraryPreparationLocationLatitude_Field,LibraryPreparationLocationLongitude_Field,RNA_seq_Field,SamplingToPreparationInterval_Field,SequencingDate_Field,SequencingLocationLatitude_Field,SequencingLocationLongitude_Field,WGS_Field
+from .fieldObjects import ATAC_seq_Field,BS_seq_Field,CAGE_seq_Field,ChIP_seq_DNA_binding_Field,ChIP_seq_input_DNA_Field,DNase_seq_Field,ExperimentCustomField_Field,ExperimentJoin_Field,Hi_C_Field,RNA_seq_Field,WGS_Field
 from .arguments.filter import ExperimentFilter_Argument
+from ..commonFieldObjects import Protocol_Field, TextUnit_Field
 def resolve_single_experiment(args):
     q = ''
 
@@ -36,26 +37,26 @@ class ExperimentNode(ObjectType):
     sampleStorage = String()
     sampleStorageProcessing = String()
 
-    samplingToPreparationInterval = Field(SamplingToPreparationInterval_Field)
+    samplingToPreparationInterval = Field(TextUnit_Field)
     
-    experimentalProtocol = Field(ExperimentalProtocol_Field)
-    extractionProtocol = Field(ExtractionProtocol_Field)
+    experimentalProtocol = Field(Protocol_Field)
+    extractionProtocol = Field(Protocol_Field)
 
 
     libraryPreparationLocation = String()
 
-    libraryPreparationLocationLatitude = Field(LibraryPreparationLocationLatitude_Field)
+    libraryPreparationLocationLatitude = Field(TextUnit_Field)
     
-    libraryPreparationLocationLongitude = Field(LibraryPreparationLocationLongitude_Field)
+    libraryPreparationLocationLongitude = Field(TextUnit_Field)
     
-    libraryPreparationDate = Field(LibraryPreparationDate_Field)
+    libraryPreparationDate = Field(TextUnit_Field)
     
     sequencingLocation = String()
 
-    sequencingLocationLongitude = Field(SequencingLocationLongitude_Field)
-    sequencingLocationLatitude = Field(SequencingLocationLatitude_Field)
+    sequencingLocationLongitude = Field(TextUnit_Field)
+    sequencingLocationLatitude = Field(TextUnit_Field)
     
-    sequencingDate = Field(SequencingDate_Field)
+    sequencingDate = Field(TextUnit_Field)
     
     customField = Field(ExperimentCustomField_Field)
     
@@ -68,7 +69,7 @@ class ExperimentNode(ObjectType):
     RNA_seq = Field(RNA_seq_Field)
     WGS = Field(WGS_Field)
     CAGE_seq = Field(CAGE_seq_Field)  
-    join = Field(ExperimentJoinField)
+    join = Field(ExperimentJoin_Field)
     
     @classmethod
     def get_node(cls, info, id):

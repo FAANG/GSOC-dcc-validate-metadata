@@ -1,6 +1,6 @@
 from graphene import InputObjectType, String, Field, Int, List
 
-class Organization_InputField(InputObjectType):
+class OrganismOrganization_InputField(InputObjectType):
     name = String()
     role = String()
     URL = String()
@@ -55,7 +55,7 @@ class PregnancyLength_InputField(InputObjectType):
     text = String()
     unit = String()
 
-class PublishedArticles_InputField(InputObjectType):
+class OrganismPublishedArticles_InputField(InputObjectType):
     articleId = String()
     title = String()
     year = String()
@@ -76,7 +76,7 @@ class OrganismFilterBasic_Argument(InputObjectType):
     versionLastStandardMet = List(String)
     project = List(String)
     secondaryProject = List(String)
-    organization = Field(Organization_InputField)
+    organization = Field(OrganismOrganization_InputField)
     customField = Field(OrganismCustomField_InputField)
     material = Field(Material_InputField)
     availability = List(String)
@@ -96,12 +96,15 @@ class OrganismFilterBasic_Argument(InputObjectType):
     childOf = List(String)
     pedigree = List(String)
     paperPublished = List(String)
-    publishedArticles = Field(PublishedArticles_InputField)
+    publishedArticles = Field(OrganismPublishedArticles_InputField)
     
 
 class OrganismFilterJoin_Argument(InputObjectType):
-    pass
+    file = Field('graphql_api.grapheneObjects.file.arguments.filter.FileFilter_Argument')
+    specimen = Field('graphql_api.grapheneObjects.specimen.arguments.filter.SpecimenFilter_Argument')
+    protocol_samples = Field('graphql_api.grapheneObjects.protocol_samples.arguments.filter.ProtocolSamplesFilter_Argument')
+
 
 class OrganismFilter_Argument(InputObjectType):
     basic = Field(OrganismFilterBasic_Argument)
-    # join = Field(OrganismFilterJoin_Argument)
+    join = Field(OrganismFilterJoin_Argument)

@@ -1,6 +1,6 @@
-from graphene import ObjectType, String
+from graphene import ObjectType, String, relay
 
-class Organization_Field(ObjectType):
+class FileOrganization_Field(ObjectType):
     name = String()
     role = String()
     URL = String()
@@ -55,9 +55,13 @@ class PregnancyLength_Field(ObjectType):
     text = String()
     unit = String()
 
-class PublishedArticles_Field(ObjectType):
+class OrganismPublishedArticles_Field(ObjectType):
     articleId = String()
     title = String()
     year = String()
     journal = String()
 
+class OrganismJoin_Field(ObjectType):
+    file = relay.ConnectionField('graphql_api.grapheneObjects.file.schema.FileConnection')
+    specimen = relay.ConnectionField('graphql_api.grapheneObjects.specimen.schema.SpecimenConnection')
+    protocol_samples = relay.ConnectionField('graphql_api.grapheneObjects.protocol_samples.schema.ProtocolSamplesConnection')

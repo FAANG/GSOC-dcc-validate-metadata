@@ -1,52 +1,11 @@
 from graphene import Field, ObjectType, String, relay
-
-class SamplingToPreparationInterval_Field(ObjectType):
-    text = String()
-    unit = String()
-
-class ExperimentalProtocol_Field(ObjectType):
-    url = String()
-    filename = String()
-
-class ExtractionProtocol_Field(ObjectType):
-    url = String()
-    filename = String()
-
-
-class LibraryPreparationLocationLongitude_Field(ObjectType):
-    text = String()
-    unit = String()
-
-class LibraryPreparationLocationLatitude_Field(ObjectType):
-    text = String()
-    unit = String()
-
-class LibraryPreparationDate_Field(ObjectType):
-    text = String()
-    unit = String()
-
-class SequencingLocationLongitude_Field(ObjectType):
-    text = String()
-    unit = String()
-
-class SequencingLocationLatitude_Field(ObjectType):
-    text = String()
-    unit = String()
-
-class SequencingDate_Field(ObjectType):
-    text = String()
-    unit = String()
+from ..commonFieldObjects import Protocol_Field
 
 class ExperimentCustomField_Field(ObjectType):
     name = String()
     value = String()
     unit = String()
     ontologyTerms = String()
-
-class Protocol_Field(ObjectType):
-    url = String()
-    filename = String()
-
 
 class ATAC_seq_Field(ObjectType):
     transposaseProtocol = Field(Protocol_Field)
@@ -111,5 +70,8 @@ class CAGE_seq_Field(ObjectType):
     rnaPurity260230ratio = String()
     rnaIntegrityNumber = String()
 
-class ExperimentJoinField(ObjectType):
+class ExperimentJoin_Field(ObjectType):
     analysis = relay.ConnectionField('graphql_api.grapheneObjects.analysis.schema.AnalysisConnection')
+    dataset = relay.ConnectionField('graphql_api.grapheneObjects.dataset.schema.DatasetConnection')
+    file = relay.ConnectionField('graphql_api.grapheneObjects.file.schema.FileConnection')
+    

@@ -4,8 +4,9 @@ from graphene.relay import Connection,Node
 from .dataloader import AnalysisLoader
 
 from ..helpers import resolve_all, resolve_single_document, resolve_with_join
-from .fieldObjects import AnalysisDate_Field, AnalysisJoin_Field, AnalysisProtocol_Field,Files_Field,AnalysisOrganism_Field
+from .fieldObjects import AnalysisDate_Field, AnalysisJoin_Field,Files_Field,AnalysisOrganism_Field
 from .arguments.filter import AnalysisFilter_Argument
+from ..commonFieldObjects import Protocol_Field
 def resolve_single_analysis(args):
     q = ''
 
@@ -46,7 +47,7 @@ class AnalysisNode(ObjectType):
     files = Field(Files_Field)
     analysisDate = Field(AnalysisDate_Field)
     assayType = String()
-    analysisProtocol = Field(AnalysisProtocol_Field)
+    analysisProtocol = Field(Protocol_Field)
     analysisType = String()
     referenceGenome = String()
     analysisCenter = String()
@@ -70,13 +71,6 @@ class AnalysisConnection(Connection):
         pass
 
 analysisLoader = AnalysisLoader()
-
-class Secondary(InputObjectType):
-    a =String()
-    b =String()
-class MyInputObjectType(InputObjectType):
-    name = String()
-    h = Field(Secondary)
 class AnalysisSchema(ObjectType):
     analysis = Field(AnalysisNode,id = ID(required=True), alternate_id = ID(required = False))
     # all_analysis = relay.ConnectionField(AnalysisConnection,filter=MyInputObjectType())

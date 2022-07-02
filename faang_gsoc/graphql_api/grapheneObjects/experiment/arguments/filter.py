@@ -1,52 +1,12 @@
+# TODO handle kebab case fields
 from graphene import Field, String, InputObjectType, List
-
-class SamplingToPreparationInterval_InputField(InputObjectType):
-    text = String()
-    unit = String()
-
-class ExperimentalProtocol_InputField(InputObjectType):
-    url = String()
-    filename = String()
-
-class ExtractionProtocol_InputField(InputObjectType):
-    url = String()
-    filename = String()
-
-
-class LibraryPreparationLocationLongitude_InputField(InputObjectType):
-    text = String()
-    unit = String()
-
-class LibraryPreparationLocationLatitude_InputField(InputObjectType):
-    text = String()
-    unit = String()
-
-class LibraryPreparationDate_InputField(InputObjectType):
-    text = String()
-    unit = String()
-
-class SequencingLocationLongitude_InputField(InputObjectType):
-    text = String()
-    unit = String()
-
-class SequencingLocationLatitude_InputField(InputObjectType):
-    text = String()
-    unit = String()
-
-class SequencingDate_InputField(InputObjectType):
-    text = String()
-    unit = String()
+from ...commonInputFieldObject import Protocol_InputField, TextUnit_InputField
 
 class CustomField_InputField(InputObjectType):
     name = String()
     value = String()
     unit = String()
     ontologyTerms = String()
-
-class Protocol_InputField(InputObjectType):
-    url = String()
-    filename = String()
-
 
 class ATAC_seq_InputField(InputObjectType):
     transposaseProtocol = Field(Protocol_InputField)
@@ -125,26 +85,26 @@ class ExperimentFilterBasic_Argument(InputObjectType):
     sampleStorage = List(String)
     sampleStorageProcessing = List(String)
 
-    samplingToPreparationInterval = Field(SamplingToPreparationInterval_InputField)
+    samplingToPreparationInterval = Field(TextUnit_InputField)
     
-    experimentalProtocol = Field(ExperimentalProtocol_InputField)
-    extractionProtocol = Field(ExtractionProtocol_InputField)
+    experimentalProtocol = Field(Protocol_InputField)
+    extractionProtocol = Field(Protocol_InputField)
 
 
     libraryPreparationLocation = List(String)
 
-    libraryPreparationLocationLatitude = Field(LibraryPreparationLocationLatitude_InputField)
+    libraryPreparationLocationLatitude = Field(TextUnit_InputField)
     
-    libraryPreparationLocationLongitude = Field(LibraryPreparationLocationLongitude_InputField)
+    libraryPreparationLocationLongitude = Field(TextUnit_InputField)
     
-    libraryPreparationDate = Field(LibraryPreparationDate_InputField)
+    libraryPreparationDate = Field(TextUnit_InputField)
     
     sequencingLocation = List(String)
 
-    sequencingLocationLongitude = Field(SequencingLocationLongitude_InputField)
-    sequencingLocationLatitude = Field(SequencingLocationLatitude_InputField)
+    sequencingLocationLongitude = Field(TextUnit_InputField)
+    sequencingLocationLatitude = Field(TextUnit_InputField)
     
-    sequencingDate = Field(SequencingDate_InputField)
+    sequencingDate = Field(TextUnit_InputField)
     
     customField = Field(CustomField_InputField)
     
@@ -161,7 +121,9 @@ class ExperimentFilterBasic_Argument(InputObjectType):
 
 class ExperimentFilterJoin_Argument(InputObjectType):
     analysis = Field('graphql_api.grapheneObjects.analysis.arguments.filter.AnalysisFilter_Argument')
-
+    dataset = Field('graphql_api.grapheneObjects.dataset.arguments.filter.DatasetFilter_Argument')
+    file = Field('graphql_api.grapheneObjects.file.arguments.filter.FileFilter_Argument')
+    
 class ExperimentFilter_Argument(InputObjectType):
     basic = Field(ExperimentFilterBasic_Argument)
     join = Field(ExperimentFilterJoin_Argument)
