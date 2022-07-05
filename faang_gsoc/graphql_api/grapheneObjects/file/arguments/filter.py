@@ -39,6 +39,8 @@ class FilePublishedArticles_InputField(InputObjectType):
 
 
 class FileFilterBasic_Argument(InputObjectType):
+    # Use "Id" instead of "_id" in query as letter after _ is capitalized in GraphQL
+    _id = List(String)
     specimen = List(String)
     organism = List(String)
     species = Field(Species_InputField)

@@ -3,11 +3,10 @@ from graphene.relay import Connection,Node
 
 from .dataloader import FileLoader
 
-from ..helpers import resolve_all, resolve_single_document, resolve_with_join
+from ..helpers import getFileIndexPrimaryKeyFromName, resolve_all, resolve_single_document, resolve_with_join
 from .fieldObjects import FileExperiment_Field,FileJoin_Field,FilePublishedArticles_Field,Run_Field,Species_Field,Study_Field
 from .arguments.filter import FileFilter_Argument
 
-# TODO handle file primary key _id which is outside _source
 def resolve_single_file(args):
     q = ''
 
@@ -20,7 +19,7 @@ def resolve_single_file(args):
         q="alternateId:{}".format(alternate_id)
     res = resolve_single_document('file',q=q)
     # print(json.dumps(res,indent=4))
-    res['id'] = res['_id']
+    res['id'] = getFileIndexPrimaryKeyFromName(res['name'])
     return res
 
 

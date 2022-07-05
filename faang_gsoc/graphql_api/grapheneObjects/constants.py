@@ -10,4 +10,4 @@ FAANG_dataset_index_relations = {
     (ANALYSIS,SPECIMEN):{'type':2,'parent_index_key':'sampleAccessions','child_index_key':'biosampleId'}
 }
 
-non_keyword_properties = set({'organism.text','libraryPreparationDate.text'})
+non_keyword_properties = set({'organism.text','libraryPreparationDate.text',"_id"})

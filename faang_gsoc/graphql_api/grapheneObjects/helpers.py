@@ -140,7 +140,7 @@ def resolve_single_document(index_name,q, **kwargs):
     return res
 
 def resolve_documents_with_key_list(index_name,key_name,keys):
-    print(keys)
+    print(index_name,key_name,keys)
     
     res = [x['_source'] for x in es.search(index = index_name,
         body = {
@@ -150,11 +150,15 @@ def resolve_documents_with_key_list(index_name,key_name,keys):
                         "filter" : {
                             "terms" : {
                                 # filter terms only works if values are lowercase
-                                key_name : [key.lower() for key in keys]
+                                key_name: keys if index_name == 'file' else [key.lower() for key in keys]
                             }
                         }
                     }
                 }
             }
     )['hits']['hits']]
+    print(res)
     return res
+    
+def getFileIndexPrimaryKeyFromName(fileName):
+    return fileName.split('.',1)[0]
