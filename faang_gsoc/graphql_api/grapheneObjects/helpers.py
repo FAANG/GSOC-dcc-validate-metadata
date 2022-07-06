@@ -3,6 +3,9 @@ import json
 
 from .constants import MAX_FILTER_QUERY_DEPTH, FAANG_dataset_index_relations, non_keyword_properties
 from faang_gsoc.es import es
+from functools import reduce
+def deep_get(dictionary, keys, default=None):
+    return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else default, keys.split("."), dictionary)
 
 def check_filter_query_depth(filter,current_depth):
     if current_depth > MAX_FILTER_QUERY_DEPTH:
@@ -14,6 +17,7 @@ def check_filter_query_depth(filter,current_depth):
         is_valid = check_filter_query_depth(filter['join'][next_index],current_depth+1)
         if not is_valid: return False
     return True
+
 
 # takes a nested dict and flattens its keys
 # example:
@@ -44,9 +48,14 @@ def get_projected_data(parent_index,child_index,parent_index_data,child_index_da
         child_index_map = {x[FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']]:x for x in child_index_data}
         for parent in parent_index_data:
             parent['join'] = defaultdict(list)
-            for child_index_key in parent[FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key']]:
+            if isinstance(parent[FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key']],list):
+                for child_index_key in parent[FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key']]:
+                    if child_index_key in child_index_map:
+                        parent['join'][child_index].append(child_index_map[child_index_key])
+            else:
+                child_index_key = parent[FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key']]
                 if child_index_key in child_index_map:
-                    parent['join'][child_index].append(child_index_map[child_index_key])
+                        parent['join'][child_index].append(child_index_map[child_index_key])
             if not inner_join or parent['join']:
                 if not parent['join']:
                     parent['join'][child_index] = []
@@ -56,7 +65,11 @@ def get_projected_data(parent_index,child_index,parent_index_data,child_index_da
     if FAANG_dataset_index_relations[(parent_index,child_index)]['type'] == 3:
         child_index_map = defaultdict(list)
         for child in child_index_data:
-            for parent_key in child[FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']]:
+            if isinstance(child[FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']],list):
+                for parent_key in child[FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']]:
+                    child_index_map[parent_key].append(child)
+            else:
+                parent_key = child[FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']]
                 child_index_map[parent_key].append(child)
 
         for parent in parent_index_data:
