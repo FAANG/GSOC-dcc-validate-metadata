@@ -44,39 +44,47 @@ def get_projected_data(parent_index,child_index,parent_index_data,child_index_da
 
     res = []
     
-    if FAANG_dataset_index_relations[(parent_index,child_index)]['type'] == 2:
-        child_index_map = {x[FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']]:x for x in child_index_data}
+    if FAANG_dataset_index_relations[(parent_index,child_index)]['type'] == 1:
+        child_index_map = {deep_get(x,FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']):x for x in child_index_data}
         for parent in parent_index_data:
             parent['join'] = defaultdict(list)
-            if isinstance(parent[FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key']],list):
-                for child_index_key in parent[FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key']]:
-                    if child_index_key in child_index_map:
-                        parent['join'][child_index].append(child_index_map[child_index_key])
+            child_values = deep_get(parent,FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key'])
+            # print(deep_get(parent,'experiment'))
+            if isinstance(child_values,list):
+                for child in child_values:
+                    child_index_key_value = deep_get(child,FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key_path']) if isinstance(child,dict) else child
+                    if child_index_key_value in child_index_map:
+                        parent['join'][child_index].append(child_index_map[child_index_key_value])       
             else:
-                child_index_key = parent[FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key']]
-                if child_index_key in child_index_map:
-                        parent['join'][child_index].append(child_index_map[child_index_key])
+                child = child_values
+                child_index_key_value = deep_get(child,FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key_path']) if isinstance(child,dict) else child
+                    
+                if child_index_key_value in child_index_map:
+                        parent['join'][child_index].append(child_index_map[child_index_key_value])
             if not inner_join or parent['join']:
                 if not parent['join']:
                     parent['join'][child_index] = []
                 res.append(parent)
             # res.append(parent)
     
-    if FAANG_dataset_index_relations[(parent_index,child_index)]['type'] == 3:
+    if FAANG_dataset_index_relations[(parent_index,child_index)]['type'] == 2:
         child_index_map = defaultdict(list)
         for child in child_index_data:
-            if isinstance(child[FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']],list):
-                for parent_key in child[FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']]:
-                    child_index_map[parent_key].append(child)
+            parent_values = deep_get(child,FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key'])
+            if isinstance(parent_values,list):
+                for parent in parent_values:
+                    parent_key_value = deep_get(parent,FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key_path']) if isinstance(parent,dict) else parent
+                    child_index_map[parent_key_value].append(child)
             else:
-                parent_key = child[FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']]
-                child_index_map[parent_key].append(child)
+                parent = parent_values
+                parent_key_value = deep_get(parent,FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key_path']) if isinstance(parent,dict) else parent
+                child_index_map[parent_key_value].append(child)
 
         for parent in parent_index_data:
             parent['join'] = defaultdict(list)
-
-            if parent[FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key']] in child_index_map:
-                parent['join'][child_index] = child_index_map[parent[FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key']]]
+            parent_key_value = deep_get(parent,FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key'])
+            if parent_key_value  in child_index_map:
+                parent['join'][child_index] = child_index_map[parent_key_value]
             if not inner_join or parent['join']:
                 if not parent['join']:
                     parent['join'][child_index] = []
@@ -109,7 +117,7 @@ def resolve_with_join(filter,current_index):
         next_filter = filter['join'][next_index]
         next_index_data = resolve_with_join(next_filter,next_index)
         current_index_data = get_projected_data(current_index,next_index,current_index_data,next_index_data,bool('basic' in next_filter and next_filter['basic']))
-    print(json.dumps(current_index_data,indent=4))
+    # print(json.dumps(current_index_data,indent=4))
     return current_index_data
         
 
@@ -170,7 +178,7 @@ def resolve_documents_with_key_list(index_name,key_name,keys):
                 }
             }
     )['hits']['hits']]
-    print(res)
+    # print(res)
     return res
     
 def getFileIndexPrimaryKeyFromName(fileName):

@@ -40,7 +40,7 @@ class DatasetNode(ObjectType):
     releaseDate = String()
     updateDate = String()
     file = Field(File_Field)
-    experiment = Field(DatasetExperiment_Field)
+    experiment = List(DatasetExperiment_Field)
     instrument = String()
     centerName = String()
     paperPublished = String()
