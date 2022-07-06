@@ -116,6 +116,7 @@ def resolve_with_join(filter,current_index):
     for next_index in list(filter['join']):
         next_filter = filter['join'][next_index]
         next_index_data = resolve_with_join(next_filter,next_index)
+        # print(next_index,next_index_data)
         current_index_data = get_projected_data(current_index,next_index,current_index_data,next_index_data,bool('basic' in next_filter and next_filter['basic']))
     # print(json.dumps(current_index_data,indent=4))
     return current_index_data
