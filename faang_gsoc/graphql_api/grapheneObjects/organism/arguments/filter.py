@@ -1,65 +1,65 @@
 from graphene import InputObjectType, String, Field, Int, List
 
 class OrganismOrganization_InputField(InputObjectType):
-    name = String()
-    role = String()
-    URL = String()
+    name = List(String)
+    role = List(String)
+    URL = List(String)
 
 class OrganismCustomField_InputField(InputObjectType):
-    name = String()
-    value = String()
-    unit = String()
-    ontologyTerms = String()
+    name = List(String)
+    value = List(String)
+    unit = List(String)
+    ontologyTerms = List(String)
 
 class Material_InputField(InputObjectType):
-    text = String()
-    ontologyTerms = String()
+    text = List(String)
+    ontologyTerms = List(String)
 
 class Organism_InputField(InputObjectType):
-    text = String()
-    ontologyTerms = String()
+    text = List(String)
+    ontologyTerms = List(String)
 
 class Sex_InputField(InputObjectType):
-    text = String()
-    ontologyTerms = String()
+    text = List(String)
+    ontologyTerms = List(String)
 
 class Breed_InputField(InputObjectType):
-    text = String()
-    ontologyTerms = String()
+    text = List(String)
+    ontologyTerms = List(String)
 
 class BirthDate_InputField(InputObjectType):
-    text = String()
-    unit = String()
+    text = List(String)
+    unit = List(String)
 
 class HealthStatus_InputField(InputObjectType):
-    text = String()
-    ontologyTerms = String()
+    text = List(String)
+    ontologyTerms = List(String)
 
 class BirthLocationLongitude_InputField(InputObjectType):
-    text = String()
-    unit = String()
+    text = List(String)
+    unit = List(String)
 
 class BirthLocationLatitude_InputField(InputObjectType):
-    text = String()
-    unit = String()
+    text = List(String)
+    unit = List(String)
 
 class BirthWeight_InputField(InputObjectType):
-    text = String()
-    unit = String()
+    text = List(String)
+    unit = List(String)
 
 class PlacentalWeight_InputField(InputObjectType):
-    text = String()
-    unit = String()
+    text = List(String)
+    unit = List(String)
 
 class PregnancyLength_InputField(InputObjectType):
-    text = String()
-    unit = String()
+    text = List(String)
+    unit = List(String)
 
 class OrganismPublishedArticles_InputField(InputObjectType):
-    articleId = String()
-    title = String()
-    year = String()
-    journal = String()
+    articleId = List(String)
+    title = List(String)
+    year = List(String)
+    journal = List(String)
 
 
 

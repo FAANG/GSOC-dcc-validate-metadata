@@ -1,21 +1,21 @@
 from graphene import InputObjectType, String, Field,List
 from ...commonInputFieldObject import Protocol_InputField
 class Files_InputField(InputObjectType):
-    name = String()
-    url = String()
-    type = String()
-    size = String()
-    checksumMethod = String()
-    checksum = String()
+    name = List(String)
+    url = List(String)
+    type = List(String)
+    size = List(String)
+    checksumMethod = List(String)
+    checksum = List(String)
 
 
 class AnalysisDate_InputField(InputObjectType):
-    text = String()
-    unit = String()
+    text = List(String)
+    unit = List(String)
 
 class AnalysisOrganism_InputField(InputObjectType):
-    text = String()
-    ontologyTerms = String()
+    text = List(String)
+    ontologyTerms = List(String)
 
 class AnalysisFilterBasic_Argument(InputObjectType):
     accession = List(String)

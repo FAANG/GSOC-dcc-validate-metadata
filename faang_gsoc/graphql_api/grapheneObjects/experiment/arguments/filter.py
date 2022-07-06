@@ -3,46 +3,46 @@ from graphene import Field, String, InputObjectType, List
 from ...commonInputFieldObject import Protocol_InputField, TextUnit_InputField
 
 class CustomField_InputField(InputObjectType):
-    name = String()
-    value = String()
-    unit = String()
-    ontologyTerms = String()
+    name = List(String)
+    value = List(String)
+    unit = List(String)
+    ontologyTerms = List(String)
 
 class ATAC_seq_InputField(InputObjectType):
     transposaseProtocol = Field(Protocol_InputField)
 
     
 class BS_seq_InputField(InputObjectType):
-    librarySelection = String()
+    librarySelection = List(String)
     bisulfiteConversionProtocol = Field(Protocol_InputField)
     pcrProductIsolationProtocol = Field(Protocol_InputField)
-    bisulfiteConversionPercent = String()
-    restrictionEnzyme = String()
-    maxFragmentSizeSelectionRange = String()
-    minFragmentSizeSelectionRange = String()
+    bisulfiteConversionPercent = List(String)
+    restrictionEnzyme = List(String)
+    maxFragmentSizeSelectionRange = List(String)
+    minFragmentSizeSelectionRange = List(String)
 
 
 class ChIP_seq_DNA_binding_InputField(InputObjectType):
     chipProtocol = Field(Protocol_InputField)
-    chipTarget = String()
-    controlExperiment = String()
-    chipAntibodyProvider = String()
-    chipAntibodyCatalog = String()
-    chipAntibodyLot = String()
-    libraryGenerationMaxFragmentSizeRange = String()
-    libraryGenerationMinFragmentSizeRange = String()
+    chipTarget = List(String)
+    controlExperiment = List(String)
+    chipAntibodyProvider = List(String)
+    chipAntibodyCatalog = List(String)
+    chipAntibodyLot = List(String)
+    libraryGenerationMaxFragmentSizeRange = List(String)
+    libraryGenerationMinFragmentSizeRange = List(String)
 
 class ChIP_seq_input_DNA_InputField(InputObjectType):
     chipProtocol = Field(Protocol_InputField)
-    libraryGenerationMaxFragmentSizeRange = String()
-    libraryGenerationMinFragmentSizeRange = String()
+    libraryGenerationMaxFragmentSizeRange = List(String)
+    libraryGenerationMinFragmentSizeRange = List(String)
 
 class DNase_seq_InputField(InputObjectType):
     dnaseProtocol = Field(Protocol_InputField)
     
 class Hi_C_InputField(InputObjectType):
-    restrictionEnzyme = String()
-    restrictionSite = String()
+    restrictionEnzyme = List(String)
+    restrictionSite = List(String)
     hi_cProtocol = Field(Protocol_InputField)
 
 class RNA_seq_InputField(InputObjectType):
@@ -51,25 +51,25 @@ class RNA_seq_InputField(InputObjectType):
     libraryGenerationPcrProductIsolationProtocol = Field(Protocol_InputField)
     preparationReverseTranscriptionProtocol = Field(Protocol_InputField)
     libraryGenerationProtocol = Field(Protocol_InputField)
-    readStrand = String()
-    rnaPurity260280ratio = String()
-    rnaPurity260230ratio = String()
-    rnaIntegrityNumber = String()
+    readStrand = List(String)
+    rnaPurity260280ratio = List(String)
+    rnaPurity260230ratio = List(String)
+    rnaIntegrityNumber = List(String)
 
 class WGS_InputField(InputObjectType):
     libraryGenerationPcrProductIsolationProtocol = Field(Protocol_InputField)
     libraryGenerationProtocol = Field(Protocol_InputField)
-    librarySelection = String()
+    librarySelection = List(String)
     
 class CAGE_seq_InputField(InputObjectType):
     cageProtocol = Field(Protocol_InputField)
-    sequencingPrimerProvider = String()
-    sequencingPrimerCatalog = String()
-    sequencingPrimerLot = String()
-    restrictionEnzymeTargetSequence = String()
-    rnaPurity260280ratio = String()
-    rnaPurity260230ratio = String()
-    rnaIntegrityNumber = String()
+    sequencingPrimerProvider = List(String)
+    sequencingPrimerCatalog = List(String)
+    sequencingPrimerLot = List(String)
+    restrictionEnzymeTargetSequence = List(String)
+    rnaPurity260280ratio = List(String)
+    rnaPurity260230ratio = List(String)
+    rnaIntegrityNumber = List(String)
 
 
 class ExperimentFilterBasic_Argument(InputObjectType):
