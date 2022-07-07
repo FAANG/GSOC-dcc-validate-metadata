@@ -47,7 +47,8 @@ def get_projected_data(parent_index,child_index,parent_index_data,child_index_da
     if FAANG_dataset_index_relations[(parent_index,child_index)]['type'] == 1:
         child_index_map = {deep_get(x,FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']):x for x in child_index_data}
         for parent in parent_index_data:
-            parent['join'] = defaultdict(list)
+            if 'join' not in parent:
+                parent['join'] = defaultdict(list)
             child_values = deep_get(parent,FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key'])
             # print(deep_get(parent,'experiment'))
             if isinstance(child_values,list):
@@ -61,8 +62,8 @@ def get_projected_data(parent_index,child_index,parent_index_data,child_index_da
                     
                 if child_index_key_value in child_index_map:
                         parent['join'][child_index].append(child_index_map[child_index_key_value])
-            if not inner_join or parent['join']:
-                if not parent['join']:
+            if not inner_join or parent['join'][child_index]:
+                if not parent['join'][child_index]:
                     parent['join'][child_index] = []
                 res.append(parent)
             # res.append(parent)
@@ -81,12 +82,13 @@ def get_projected_data(parent_index,child_index,parent_index_data,child_index_da
                 child_index_map[parent_key_value].append(child)
 
         for parent in parent_index_data:
-            parent['join'] = defaultdict(list)
+            if 'join' not in parent:
+                parent['join'] = defaultdict(list)
             parent_key_value = deep_get(parent,FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key'])
             if parent_key_value  in child_index_map:
                 parent['join'][child_index] = child_index_map[parent_key_value]
-            if not inner_join or parent['join']:
-                if not parent['join']:
+            if not inner_join or parent['join'][child_index]:
+                if not parent['join'][child_index]:
                     parent['join'][child_index] = []
                 res.append(parent)
             # res.append(parent)
@@ -117,7 +119,10 @@ def resolve_with_join(filter,current_index):
         next_filter = filter['join'][next_index]
         next_index_data = resolve_with_join(next_filter,next_index)
         # print(next_index,next_index_data)
+        
         current_index_data = get_projected_data(current_index,next_index,current_index_data,next_index_data,bool('basic' in next_filter and next_filter['basic']))
+        # print([list(x['join']) if 'join' in x else None for x in current_index_data])
+        
     # print(json.dumps(current_index_data,indent=4))
     return current_index_data
         
