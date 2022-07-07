@@ -3,23 +3,9 @@ from graphene.relay import Connection,Node
 
 from .dataloader import ArticleLoader
 
-from ..helpers import resolve_all, resolve_single_document, resolve_with_join
+from ..helpers import resolve_all, resolve_single_document, resolve_with_join, sanitize_filter_basic_query
 from .fieldObjects import RelatedDatasets_Field,ArticleJoin_Field
 from .arguments.filter import ArticleFilter_Argument
-def resolve_single_article(args):
-    q = ''
-
-    if args['id']:
-        id = args['id']
-        q="pmcId:{}".format(id)
-    elif args['alternate_id']:
-        alternate_id = args['alternate_id']
-        q="pubmedId:{}".format(alternate_id)
-    res = resolve_single_document('article',q=q)
-    # print(json.dumps(res,indent=4))
-    res['id'] = res['pmcId'] if 'pmcId' in res and res['pmcId'] else res['pubmedId'] 
-    return res
-
 
 class ArticleNode(ObjectType):
     class Meta:
@@ -64,7 +50,8 @@ class ArticleSchema(ObjectType):
     some_articles = relay.ConnectionField(ArticleConnection,ids = List(of_type=String, required=True))
 
     def resolve_article(root,info,**args):
-        return resolve_single_article(args)
+        res = resolve_single_document('article',args['id'],['pmcId','pubmedId'])
+        return res
 
     def resolve_all_articles(root, info,**kwargs):
         filter_query = kwargs['filter'] if 'filter' in kwargs else {}

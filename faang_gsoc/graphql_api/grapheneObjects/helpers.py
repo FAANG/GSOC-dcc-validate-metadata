@@ -162,8 +162,17 @@ def resolve_all(index_name,**kwargs):
     # print(json.dumps(fetched_data['hits']['hits'],indent=4))
     return res
 
-def resolve_single_document(index_name,q, **kwargs):
-    res =  es.search(index = index_name,q=q)['hits']['hits'][0]['_source']
+def resolve_single_document(index_name,id,primary_keys):
+    
+    body = {
+        "query":{
+            "bool":{
+                "should":[{"term":{key + '.keyword':id}} for key in primary_keys]
+            }
+        }
+    }
+
+    res =  es.search(index = index_name,body=body)['hits']['hits'][0]['_source']
     return res
 
 def resolve_documents_with_key_list(index_name,key_name,keys):
