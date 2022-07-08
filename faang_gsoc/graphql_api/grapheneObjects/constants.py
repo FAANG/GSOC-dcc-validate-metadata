@@ -22,8 +22,8 @@ FAANG_dataset_index_relations = {
     
     (ARTICLE,ANALYSIS):{'type':1,'parent_index_key':'relatedDatasets','child_index_key':'datasetAccession','parent_index_key_path':'accession'},
     (ARTICLE,DATASET):{'type':1,'parent_index_key':'relatedDatasets','child_index_key':'accession','parent_index_key_path':'accession'},
-    (ARTICLE,FILE):{'type':2,'parent_index_key':'pmcId','child_index_key':'publishedArticles','child_index_key_path':'articleId'},
-    (ARTICLE,SPECIMEN):{'type':2,'parent_index_key':'pmcId','child_index_key':'publishedArticles','child_index_key_path':'articleId'},
+    (ARTICLE,FILE):{'type':2,'parent_index_key':'_id','child_index_key':'publishedArticles','child_index_key_path':'articleId'},
+    (ARTICLE,SPECIMEN):{'type':2,'parent_index_key':'_id','child_index_key':'publishedArticles','child_index_key_path':'articleId'},
     
     (DATASET,EXPERIMENT):{'type':1,'parent_index_key':'experiment','child_index_key':'accession','parent_index_key_path':'accession'},
     (DATASET,ANALYSIS):{'type':2,'parent_index_key':'accession','child_index_key':'dataAccession'},
@@ -35,7 +35,7 @@ FAANG_dataset_index_relations = {
     (EXPERIMENT,DATASET):{'type':2,'parent_index_key':'accession','child_index_key':'experiment','child_index_key_path':'accession'},
     (EXPERIMENT,FILE):{'type':2,'parent_index_key':'accession','child_index_key':'experiment','child_index_key_path':'accession'},
     
-    (FILE,ARTICLE):{'type':1,'parent_index_key':'publishedArticles','child_index_key':'pmcId','parent_index_key_path':'articleId'},
+    (FILE,ARTICLE):{'type':1,'parent_index_key':'publishedArticles','child_index_key':'_id','parent_index_key_path':'articleId'},
     (FILE,DATASET):{'type':2,'parent_index_key':'name','child_index_key':'file','child_index_key_path':'name'},
     (FILE,EXPERIMENT):{'type':1,'parent_index_key':'experiment','child_index_key':'accession','parent_index_key_path':'accession'},
     (FILE,ORGANISM):{'type':1,'parent_index_key':'organism','child_index_key':'biosampleId'},
@@ -45,7 +45,7 @@ FAANG_dataset_index_relations = {
     
     (SPECIMEN,ANALYSIS):{'type':2,'parent_index_key':'biosampleId','child_index_key':'sampleAccessions'},
     (SPECIMEN,ORGANISM):{'type':1,'parent_index_key':'derivedFrom','child_index_key':'biosampleId'},
-    (SPECIMEN,ARTICLE):{'type':1,'parent_index_key':'publishedArticles','child_index_key':'pmcId','parent_index_key_path':'articleId'},
+    (SPECIMEN,ARTICLE):{'type':1,'parent_index_key':'publishedArticles','child_index_key':'_id','parent_index_key_path':'articleId'},
     (SPECIMEN,DATASET):{'type':2,'parent_index_key':'biosampleId','child_index_key':'specimen','child_index_key_path':'biosampleId'},
     (SPECIMEN,PROTOCOL_SAMPLES):{'type':2,'parent_index_key':'biosampleId','child_index_key':'specimens','child_index_key_path':'id'},
     (SPECIMEN,FILE):{'type':1,'parent_index_key':'biosampleId','child_index_key':'specimen'},

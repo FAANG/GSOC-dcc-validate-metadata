@@ -19,7 +19,7 @@ class Query(OrganismSchema,ExperimentSchema, AnalysisSchema, ArticleSchema, Data
     def resolve_hello(parent,info):
         # res = graphql_task.apply_async(queue='graphql_q')
         res2 = resolve_all('organism')
-        print(res2)
+        # print(res2)
         # res = graphql_task.apply_async(queue='graphql_api')
         # print(res)
         return res2

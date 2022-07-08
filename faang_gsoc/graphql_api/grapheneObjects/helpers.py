@@ -7,6 +7,12 @@ from functools import reduce
 def deep_get(dictionary, keys, default=None):
     return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else default, keys.split("."), dictionary)
 
+def add_id_to_document(document):
+    _id = document['_id'] if '_id' in document else ''
+    document = document['_source']
+    document['_id'] = _id
+    return document
+
 def check_filter_query_depth(filter,current_depth):
     if current_depth > MAX_FILTER_QUERY_DEPTH:
         return False
@@ -151,12 +157,12 @@ def resolve_all(index_name,**kwargs):
                 'match_all' : {}
             }
 
-    fetched_data = es.search(index = index_name,filter_path = ['hits.hits._source'],body = {
+    fetched_data = es.search(index = index_name,body = {
             'size' : 10000,
             'query': query
         })
     
-    res = [x['_source'] for x in fetched_data['hits']['hits']] if fetched_data else []
+    res = [add_id_to_document(x) for x in fetched_data['hits']['hits']] if fetched_data else []
     print('resresres')
     # print(json.dumps(res,indent=4))
     # print(json.dumps(fetched_data['hits']['hits'],indent=4))
@@ -178,7 +184,7 @@ def resolve_single_document(index_name,id,primary_keys):
 def resolve_documents_with_key_list(index_name,key_name,keys):
     print(index_name,key_name,keys)
     
-    res = [x['_source'] for x in es.search(index = index_name,
+    res = [add_id_to_document(x) for x in es.search(index = index_name,
         body = {
                 'size' : 10000,
                 'query': {
