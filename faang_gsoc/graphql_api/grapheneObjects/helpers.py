@@ -4,6 +4,7 @@ import json
 from .constants import MAX_FILTER_QUERY_DEPTH, FAANG_dataset_index_relations, non_keyword_properties
 from faang_gsoc.es import es
 from functools import reduce
+from .errors import QUERY_MAX_DEPTH_EXCEEDED
 def deep_get(dictionary, keys, default=None):
     return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else default, keys.split("."), dictionary)
 
@@ -13,14 +14,14 @@ def add_id_to_document(document):
     document['_id'] = _id
     return document
 
-def check_filter_query_depth(filter,current_depth):
+def is_filter_query_depth_valid(filter,current_depth=1):
     if current_depth > MAX_FILTER_QUERY_DEPTH:
         return False
     if not 'join' in filter:
         return True
 
     for next_index in list(filter['join']):
-        is_valid = check_filter_query_depth(filter['join'][next_index],current_depth+1)
+        is_valid = is_filter_query_depth_valid(filter['join'][next_index],current_depth+1)
         if not is_valid: return False
     return True
 
@@ -100,8 +101,9 @@ def get_projected_data(parent_index,child_index,parent_index_data,child_index_da
             # res.append(parent)
     return res
 def resolve_with_join(filter,current_index):
-    # print(check_filter_query_depth(filter,1))
-
+    # print(is_filter_query_depth_valid(filter,1))
+    if not is_filter_query_depth_valid(filter):
+        raise Exception(QUERY_MAX_DEPTH_EXCEEDED)
 
     if not bool(filter):
         return resolve_all(current_index)
@@ -178,8 +180,8 @@ def resolve_single_document(index_name,id,primary_keys):
         }
     }
 
-    res =  es.search(index = index_name,body=body)['hits']['hits'][0]['_source']
-    return res
+    res =  es.search(index = index_name,body=body)['hits']['hits']
+    return res[0]['_source'] if res else None
 
 def resolve_documents_with_key_list(index_name,key_name,keys):
     print(index_name,key_name,keys)
