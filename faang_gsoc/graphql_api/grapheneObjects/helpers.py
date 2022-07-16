@@ -20,8 +20,8 @@ def is_filter_query_depth_valid(filter,current_depth=1):
     if not 'join' in filter:
         return True
 
-    for next_index in list(filter['join']):
-        is_valid = is_filter_query_depth_valid(filter['join'][next_index],current_depth+1)
+    for right_index in list(filter['join']):
+        is_valid = is_filter_query_depth_valid(filter['join'][right_index],current_depth+1)
         if not is_valid: return False
     return True
 
@@ -47,92 +47,87 @@ def sanitize_filter_basic_query(filter_basic_query,sanitized_filter_basic_querie
             if sanitized_key not in non_keyword_properties:
                 sanitized_key += '.keyword'
             sanitized_filter_basic_queries.append({"terms":{sanitized_key : filter_basic_query[key]}})
-def get_projected_data(parent_index,child_index,parent_index_data,child_index_data,inner_join = True):
+            
+def get_projected_data(left_index,right_index,left_index_data,right_index_data,inner_join = True):
 
     res = []
     
-    if FAANG_dataset_index_relations[(parent_index,child_index)]['type'] == 1:
-        child_index_map = {deep_get(x,FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key']):x for x in child_index_data}
-        for parent in parent_index_data:
-            if 'join' not in parent:
-                parent['join'] = defaultdict(list)
-            child_values = deep_get(parent,FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key'])
-            # print(deep_get(parent,'experiment'))
-            if isinstance(child_values,list):
-                for child in child_values:
-                    child_index_key_value = deep_get(child,FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key_path']) if isinstance(child,dict) else child
-                    if child_index_key_value in child_index_map:
-                        parent['join'][child_index].append(child_index_map[child_index_key_value])       
+    if FAANG_dataset_index_relations[(left_index,right_index)]['type'] == 1:
+        right_index_map = {deep_get(x,FAANG_dataset_index_relations[(left_index,right_index)]['right_index_key']):x for x in right_index_data}
+        for left_document in left_index_data:
+            if 'join' not in left_document:
+                left_document['join'] = defaultdict(list)
+            right_document_values = deep_get(left_document,FAANG_dataset_index_relations[(left_index,right_index)]['left_index_key'])
+            # print(deep_get(left_document,'experiment'))
+            if isinstance(right_document_values,list):
+                for right_document in right_document_values:
+                    right_index_key_value = deep_get(right_document,FAANG_dataset_index_relations[(left_index,right_index)]['left_index_key_path']) if isinstance(right_document,dict) else right_document
+                    if right_index_key_value in right_index_map:
+                        left_document['join'][right_index].append(right_index_map[right_index_key_value])       
             else:
-                child = child_values
-                child_index_key_value = deep_get(child,FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key_path']) if isinstance(child,dict) else child
+                right_document = right_document_values
+                right_index_key_value = deep_get(right_document,FAANG_dataset_index_relations[(left_index,right_index)]['left_index_key_path']) if isinstance(right_document,dict) else right_document
                     
-                if child_index_key_value in child_index_map:
-                        parent['join'][child_index].append(child_index_map[child_index_key_value])
-            if not inner_join or parent['join'][child_index]:
-                if not parent['join'][child_index]:
-                    parent['join'][child_index] = []
-                res.append(parent)
-            # res.append(parent)
+                if right_index_key_value in right_index_map:
+                        left_document['join'][right_index].append(right_index_map[right_index_key_value])
+            if not inner_join or left_document['join'][right_index]:
+                if not left_document['join'][right_index]:
+                    left_document['join'][right_index] = []
+                res.append(left_document)
+            # res.append(left_document)
     
-    if FAANG_dataset_index_relations[(parent_index,child_index)]['type'] == 2:
-        child_index_map = defaultdict(list)
-        for child in child_index_data:
-            parent_values = deep_get(child,FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key'])
-            if isinstance(parent_values,list):
-                for parent in parent_values:
-                    parent_key_value = deep_get(parent,FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key_path']) if isinstance(parent,dict) else parent
-                    child_index_map[parent_key_value].append(child)
+    if FAANG_dataset_index_relations[(left_index,right_index)]['type'] == 2:
+        right_index_map = defaultdict(list)
+        for right_document in right_index_data:
+            left_values = deep_get(right_document,FAANG_dataset_index_relations[(left_index,right_index)]['right_index_key'])
+            if isinstance(left_values,list):
+                for left_document in left_values:
+                    left_document_key_value = deep_get(left_document,FAANG_dataset_index_relations[(left_index,right_index)]['right_index_key_path']) if isinstance(left_document,dict) else left_document
+                    right_index_map[left_document_key_value].append(right_document)
             else:
-                parent = parent_values
-                parent_key_value = deep_get(parent,FAANG_dataset_index_relations[(parent_index,child_index)]['child_index_key_path']) if isinstance(parent,dict) else parent
-                child_index_map[parent_key_value].append(child)
+                left_document = left_values
+                left_document_key_value = deep_get(left_document,FAANG_dataset_index_relations[(left_index,right_index)]['right_index_key_path']) if isinstance(left_document,dict) else left_document
+                right_index_map[left_document_key_value].append(right_document)
 
-        for parent in parent_index_data:
-            if 'join' not in parent:
-                parent['join'] = defaultdict(list)
-            parent_key_value = deep_get(parent,FAANG_dataset_index_relations[(parent_index,child_index)]['parent_index_key'])
-            if parent_key_value  in child_index_map:
-                parent['join'][child_index] = child_index_map[parent_key_value]
-            if not inner_join or parent['join'][child_index]:
-                if not parent['join'][child_index]:
-                    parent['join'][child_index] = []
-                res.append(parent)
-            # res.append(parent)
+        for left_document in left_index_data:
+            if 'join' not in left_document:
+                left_document['join'] = defaultdict(list)
+            left_document_key_value = deep_get(left_document,FAANG_dataset_index_relations[(left_index,right_index)]['left_index_key'])
+            if left_document_key_value  in right_index_map:
+                left_document['join'][right_index] = right_index_map[left_document_key_value]
+            if not inner_join or left_document['join'][right_index]:
+                if not left_document['join'][right_index]:
+                    left_document['join'][right_index] = []
+                res.append(left_document)
+            # res.append(left_document)
     return res
-def resolve_with_join(filter,current_index):
-    # print(is_filter_query_depth_valid(filter,1))
+
+def resolve_with_join(filter,left_index):
+    
     if not is_filter_query_depth_valid(filter):
         raise Exception(QUERY_MAX_DEPTH_EXCEEDED)
 
     if not bool(filter):
-        return resolve_all(current_index)
+        return resolve_all(left_index)
 
-#  with basic filters
     sanitized_basic_filter_queries = []
 
     if 'basic' in filter:
         sanitize_filter_basic_query(filter['basic'],sanitized_basic_filter_queries)
         print(sanitized_basic_filter_queries)
     
-    # filter_query = {"accession":['ERZ10183149', 'ERZ10183096', "ERX5463437","ERX5463438"]}
-    # filter_query = {}
-    # sanitize_filter_basic_query(filter_query,sanitized_basic_filter)
-    current_index_data = resolve_all(current_index,filter=sanitized_basic_filter_queries)
+    left_index_data = resolve_all(left_index,filter=sanitized_basic_filter_queries)
     
-    if not bool(current_index_data) or not 'join' in filter:
-        return current_index_data
+    if not bool(left_index_data) or not 'join' in filter:
+        return left_index_data
 
-    for next_index in list(filter['join']):
-        next_filter = filter['join'][next_index]
-        next_index_data = resolve_with_join(next_filter,next_index)
-        # print(next_index,next_index_data)
+    for right_index in list(filter['join']):
+        right_index_filter = filter['join'][right_index]
+        right_index_data = resolve_with_join(right_index_filter,right_index)
         
-        current_index_data = get_projected_data(current_index,next_index,current_index_data,next_index_data,bool('basic' in next_filter and next_filter['basic']))
-        # print([list(x['join']) if 'join' in x else None for x in current_index_data])
+        left_index_data = get_projected_data(left_index,right_index,left_index_data,right_index_data,bool('basic' in right_index_filter and right_index_filter['basic']))
         
-    # print(json.dumps(current_index_data,indent=4))
-    return current_index_data
+    return left_index_data
         
 
 def resolve_all(index_name,**kwargs):
@@ -144,14 +139,6 @@ def resolve_all(index_name,**kwargs):
         query = {
             "bool" : {
                         "filter": filter_queries
-                        # "filter" : [
-                        #     # "terms" : {
-                        #     #     # filter terms only works if values are lowercase
-                        #     #     # key_name : [key.lower() for key in keys]
-                        #     # }
-                        #    { "terms" : filter_query},
-                        # #    {"terms":{"accession.keyword":["ERZ10183153"]}}
-                        # ]
                     }
             }
     else:
@@ -165,9 +152,6 @@ def resolve_all(index_name,**kwargs):
         })
     
     res = [add_id_to_document(x) for x in fetched_data['hits']['hits']] if fetched_data else []
-    print('resresres')
-    # print(json.dumps(res,indent=4))
-    # print(json.dumps(fetched_data['hits']['hits'],indent=4))
     return res
 
 def resolve_single_document(index_name,id,primary_keys):
@@ -175,6 +159,10 @@ def resolve_single_document(index_name,id,primary_keys):
     body = {
         "query":{
             "bool":{
+                # We append '.keyword' to the key name because otherwise elasticsearch 
+                # returns nothing. Hence we need to either append '.keyword' to key name
+                # or convert all the values to lower case. This is because these fields
+                # are not analysed by elasticsearch.
                 "should":[{"term":{key + '.keyword':id}} for key in primary_keys]
             }
         }
