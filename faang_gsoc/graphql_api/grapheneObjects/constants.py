@@ -12,11 +12,27 @@ PROTOCOL_FILES = 'protocol_files'
 PROTOCOL_SAMPLES = 'protocol_samples'
   
 FAANG_dataset_index_relations = {
+    
+    # These are the keys of the relations map:
+    # 1. type: specifies whether  relation is Type 1 or Type 2,
+    
+    # 2. left_index_key:  specifies the field in the LEFT index based on which we make a join
+    # For type 1 relation, it is the foreign key/s and for type 2 it is the primary key 
+
+    # 3. right_index_key: specifies the field in the RIGHT index based on which we make a join
+    # For type 1 relation, it is the primary key and for type 2 it is the foreign key/s
+
+    # 4. left_index_key_path (optional): Sometimes the primary/foreign keys are not strings or number
+    # but rather they are objects. Hence this key specifies the path of the key inside the nested object
+    # which is our key to consider for joining for LEFT index.
+
+    # 5. right_index_key_path (optional): Sometimes the primary/foreign keys are not strings or number
+    # but rather they are objects. Hence this key specifies the path of the key inside the nested object
+    # which is our key to consider for joining for RIGHT index.
+
     (ANALYSIS,EXPERIMENT): {'type':1, 'left_index_key': 'experimentAccessions', 'right_index_key': 'accession'},
-    # TODO add explaination of right_index_key_path
     (ANALYSIS,ARTICLE):{'type':2,'left_index_key':'datasetAccession','right_index_key':'relatedDatasets','right_index_key_path':'accession'},
     (ANALYSIS,DATASET):{'type':1,'left_index_key':'datasetAccession','right_index_key':'accession'},
-    # TODO add explaination of left_index_key_path
     (ANALYSIS,PROTOCOL_ANALYSIS):{'type':1,'left_index_key':'analysisProtocol','right_index_key':'key','left_index_key_path':'filename'},
     (ANALYSIS,SPECIMEN):{'type':1,'left_index_key':'sampleAccessions','right_index_key':'biosampleId'},
     
