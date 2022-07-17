@@ -371,6 +371,8 @@ def resolve_documents_with_key_list(index_name,key_name,keys):
     )['hits']['hits']]
     # print(res)
     return res
-    
+
+# The primary key for file index can be derived from "name" field by removing file extension.
+# Eg. if name of file document is SRR7165835_2.fastq.gz, then its primary key is SRR7165835_2.
 def getFileIndexPrimaryKeyFromName(fileName):
     return fileName.split('.',1)[0]
