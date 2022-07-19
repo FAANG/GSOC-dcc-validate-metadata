@@ -107,19 +107,17 @@ class SpecimenFilterBasic_Argument(InputObjectType):
     paperPublished = List(String)
     publishedArticles = Field(SpecimenPublishedArticles_InputField)
     trackhubUrl = List(String)
-    
-class SpecimenFilterJoinDerivedFrom_InputField(InputObjectType):
-    organism = Field('graphql_api.grapheneObjects.organism.arguments.filter.OrganismFilter_Argument')
-    specimen = Field('graphql_api.grapheneObjects.specimen.arguments.filter.SpecimenFilter_Argument')
-    
+        
 class SpecimenFilterJoin_Argument(InputObjectType):
     analysis = Field('graphql_api.grapheneObjects.analysis.arguments.filter.AnalysisFilter_Argument')
     article = Field('graphql_api.grapheneObjects.article.arguments.filter.ArticleFilter_Argument')
     dataset = Field('graphql_api.grapheneObjects.dataset.arguments.filter.DatasetFilter_Argument')
     file = Field('graphql_api.grapheneObjects.file.arguments.filter.FileFilter_Argument')
-    # organism = Field('graphql_api.grapheneObjects.organism.arguments.filter.OrganismFilter_Argument')
     protocol_samples = Field('graphql_api.grapheneObjects.protocol_samples.arguments.filter.ProtocolSamplesFilter_Argument')
-    derived_from = Field(SpecimenFilterJoinDerivedFrom_InputField)
+    derived_from_organism = Field('graphql_api.grapheneObjects.organism.arguments.filter.OrganismFilter_Argument')
+    derived_from_specimen = Field('graphql_api.grapheneObjects.specimen.arguments.filter.SpecimenFilter_Argument')
+    derives_specimen_sample = Field('graphql_api.grapheneObjects.specimen.arguments.filter.SpecimenFilter_Argument')
+    
 class SpecimenFilter_Argument(InputObjectType):
     basic = Field(SpecimenFilterBasic_Argument)
     join = Field(SpecimenFilterJoin_Argument)

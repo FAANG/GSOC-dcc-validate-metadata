@@ -10,7 +10,11 @@ FILE = 'file'
 PROTOCOL_ANALYSIS = 'protocol_analysis'
 PROTOCOL_FILES = 'protocol_files'
 PROTOCOL_SAMPLES = 'protocol_samples'
-  
+
+DERIVED_FROM_ORGANISM = 'derived_from_organism'
+DERIVED_FROM_SPECIMEN = 'derived_from_specimen'
+DERIVES_SPECIMEN_SAMPLE = 'derives_specimen_sample'
+
 FAANG_dataset_index_relations = {
     
     # These are the keys of the relations map:
@@ -60,12 +64,13 @@ FAANG_dataset_index_relations = {
     (FILE,SPECIMEN):{'type':1,'left_index_key':'specimen','right_index_key':'biosampleId'},
     
     (SPECIMEN,ANALYSIS):{'type':2,'left_index_key':'biosampleId','right_index_key':'sampleAccessions'},
-    (SPECIMEN,ORGANISM):{'type':1,'left_index_key':'derivedFrom','right_index_key':'biosampleId'},
+    (SPECIMEN,DERIVED_FROM_ORGANISM):{'type':1,'left_index_key':'derivedFrom','right_index_key':'biosampleId'},
     (SPECIMEN,ARTICLE):{'type':1,'left_index_key':'publishedArticles','right_index_key':'_id','left_index_key_path':'articleId'},
     (SPECIMEN,DATASET):{'type':2,'left_index_key':'biosampleId','right_index_key':'specimen','right_index_key_path':'biosampleId'},
     (SPECIMEN,PROTOCOL_SAMPLES):{'type':2,'left_index_key':'biosampleId','right_index_key':'specimens','right_index_key_path':'id'},
     (SPECIMEN,FILE):{'type':1,'left_index_key':'biosampleId','right_index_key':'specimen'},
-    
+    (SPECIMEN,DERIVES_SPECIMEN_SAMPLE):{'type':1,'left_index_key':'derivedFrom','right_index_key':'biosampleId'},
+    (SPECIMEN,DERIVED_FROM_SPECIMEN):{'type':2,'left_index_key':'biosampleId','right_index_key':'derivedFrom'},
     
     (ORGANISM,SPECIMEN):{'type':2,'left_index_key':'biosampleId','right_index_key':'derivedFrom'},
     (ORGANISM,FILE):{'type':2,'left_index_key':'biosampleId','right_index_key':'organism'},

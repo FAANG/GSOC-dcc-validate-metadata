@@ -62,25 +62,6 @@ def sanitize_filter_basic_query(filter_basic_query,sanitized_filter_basic_querie
                 sanitized_key += '.keyword'
             sanitized_filter_basic_queries.append({"terms":{sanitized_key : filter_basic_query[key]}})
 
-def handle_specimen_derived_from_filter_query(filter_query):
-    if not bool(filter_query) or not 'join' in filter_query:
-        return
-
-    if 'derived_from' in filter_query['join']:
-
-        if not filter_query['join']['derived_from']:
-            return Exception(DERIVED_FROM_EMPTY)
-
-        for derived_from_right_index in list(filter_query['join']['derived_from']):
-            filter_query['join'][derived_from_right_index] = filter_query['join']['derived_from'][derived_from_right_index]
-
-        del filter_query['join']['derived_from']
-    
-    for right_index in list(filter_query['join']):
-        handle_specimen_derived_from_filter_query(filter_query['join'][right_index])
-    
-
-
 
 def get_projected_data(left_index,right_index,left_index_data,right_index_data,inner_join = True):
 
@@ -280,8 +261,6 @@ def resolve_with_join(filter,left_index):
         # this function returns all the documents of the specified index
         return resolve_all(left_index)
     
-    handle_specimen_derived_from_filter_query(filter)
-    
     sanitized_basic_filter_queries = []
     if 'basic' in filter:
         # Please read about what we are doing here in function definition
@@ -335,6 +314,12 @@ def resolve_with_join(filter,left_index):
         
 
 def resolve_all(index_name,**kwargs):
+
+    if index_name in ['derived_from_specimen','derives_specimen_sample']:
+        index_name = 'specimen'
+    elif index_name == 'derived_from_organism':
+        index_name = 'organism'
+
     filter_queries = kwargs['filter'] if 'filter' in kwargs else []
 
     query = {}

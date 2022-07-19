@@ -76,16 +76,14 @@ class SpecimenPublishedArticles_Field(ObjectType):
     journal = String()
     pubmedId = String()
     doi = String()
-
-class SpecimenJoinDerivedFrom_Field(ObjectType):
-    organism = relay.ConnectionField('graphql_api.grapheneObjects.organism.schema.OrganismConnection')
-    specimen = relay.ConnectionField('graphql_api.grapheneObjects.specimen.schema.SpecimenConnection')
     
 class SpecimenJoin_Field(ObjectType):
     analysis = relay.ConnectionField('graphql_api.grapheneObjects.analysis.schema.AnalysisConnection')
     article = relay.ConnectionField('graphql_api.grapheneObjects.article.schema.ArticleConnection')
     dataset = relay.ConnectionField('graphql_api.grapheneObjects.dataset.schema.DatasetConnection')
     file = relay.ConnectionField('graphql_api.grapheneObjects.file.schema.FileConnection')
-    # organism = relay.ConnectionField('graphql_api.grapheneObjects.organism.schema.OrganismConnection')
     protocol_samples = relay.ConnectionField('graphql_api.grapheneObjects.protocol_samples.schema.ProtocolSamplesConnection')
-    derived_from = Field(SpecimenJoinDerivedFrom_Field)
+    derived_from_organism = relay.ConnectionField('graphql_api.grapheneObjects.organism.schema.OrganismConnection')
+    derived_from_specimen = relay.ConnectionField('graphql_api.grapheneObjects.specimen.schema.SpecimenConnection')
+    derives_specimen_sample = relay.ConnectionField('graphql_api.grapheneObjects.specimen.schema.SpecimenConnection')
+    
