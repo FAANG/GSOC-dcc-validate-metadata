@@ -69,8 +69,8 @@ FAANG_dataset_index_relations = {
     (SPECIMEN,DATASET):{'type':2,'left_index_key':'biosampleId','right_index_key':'specimen','right_index_key_path':'biosampleId'},
     (SPECIMEN,PROTOCOL_SAMPLES):{'type':2,'left_index_key':'biosampleId','right_index_key':'specimens','right_index_key_path':'id'},
     (SPECIMEN,FILE):{'type':1,'left_index_key':'biosampleId','right_index_key':'specimen'},
-    (SPECIMEN,DERIVES_SPECIMEN_SAMPLE):{'type':1,'left_index_key':'derivedFrom','right_index_key':'biosampleId'},
-    (SPECIMEN,DERIVED_FROM_SPECIMEN):{'type':2,'left_index_key':'biosampleId','right_index_key':'derivedFrom'},
+    (SPECIMEN,DERIVED_FROM_SPECIMEN):{'type':1,'left_index_key':'derivedFrom','right_index_key':'biosampleId'},
+    (SPECIMEN,DERIVES_SPECIMEN_SAMPLE):{'type':2,'left_index_key':'biosampleId','right_index_key':'derivedFrom'},
     
     (ORGANISM,SPECIMEN):{'type':2,'left_index_key':'biosampleId','right_index_key':'derivedFrom'},
     (ORGANISM,FILE):{'type':2,'left_index_key':'biosampleId','right_index_key':'organism'},
