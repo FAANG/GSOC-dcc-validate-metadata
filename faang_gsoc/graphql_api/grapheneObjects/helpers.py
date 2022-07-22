@@ -4,7 +4,7 @@ import json
 from .constants import MAX_FILTER_QUERY_DEPTH, FAANG_dataset_index_relations, non_keyword_properties
 from faang_gsoc.es import es
 from functools import reduce
-from .errors import QUERY_MAX_DEPTH_EXCEEDED
+from .errors import QUERY_MAX_DEPTH_EXCEEDED, DERIVED_FROM_EMPTY
 
 # '''
 # This function takes in a string path and returns a value.
@@ -61,7 +61,8 @@ def sanitize_filter_basic_query(filter_basic_query,sanitized_filter_basic_querie
             if sanitized_key not in non_keyword_properties:
                 sanitized_key += '.keyword'
             sanitized_filter_basic_queries.append({"terms":{sanitized_key : filter_basic_query[key]}})
-            
+
+
 def get_projected_data(left_index,right_index,left_index_data,right_index_data,inner_join = True):
 
     #  this is going to be our joined resultant data
@@ -249,6 +250,7 @@ def get_projected_data(left_index,right_index,left_index_data,right_index_data,i
 
 def resolve_with_join(filter,left_index):
     
+
     # check how deep is the query for join. That is if we have a join between more than
     # 3 indices then the query is invalid and hence throw an exception
     if not is_filter_query_depth_valid(filter):
@@ -258,7 +260,7 @@ def resolve_with_join(filter,left_index):
     if not bool(filter):
         # this function returns all the documents of the specified index
         return resolve_all(left_index)
-
+    
     sanitized_basic_filter_queries = []
     if 'basic' in filter:
         # Please read about what we are doing here in function definition
@@ -312,6 +314,12 @@ def resolve_with_join(filter,left_index):
         
 
 def resolve_all(index_name,**kwargs):
+
+    if index_name in ['derived_from_specimen','derives_specimen_sample']:
+        index_name = 'specimen'
+    elif index_name == 'derived_from_organism':
+        index_name = 'organism'
+
     filter_queries = kwargs['filter'] if 'filter' in kwargs else []
 
     query = {}
