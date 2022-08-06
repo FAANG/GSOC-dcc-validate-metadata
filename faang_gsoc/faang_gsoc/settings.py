@@ -62,8 +62,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = ['http://localhost:4200']
-
+# CORS_ALLOWED_ORIGINS = ['http://localhost:4200']
+CORS_ALLOW_ALL_ORIGINS = True
+# CSRF_COOKIE_SECURE = False
 GRAPHENE = {
     "SCHEMA": "graphql_api.schema.schema"
 }
