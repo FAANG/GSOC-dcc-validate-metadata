@@ -1,6 +1,8 @@
 from faang_gsoc.celery import app
 from faang_gsoc.helpers import send_message
 from faang_gsoc.constants import ALLOWED_TEMPLATES
+from graphql_api.grapheneObjects.helpers import resolve_with_join
+
 from celery import Task
 from celery.utils.log import get_task_logger
 from celery.signals import after_setup_logger
@@ -29,7 +31,14 @@ class LogErrorsTask(Task):
 
 
 @app.task(base=LogErrorsTask)
-def graphql_task():
-    time.sleep(20)
+def graphql_task(a1,a2):
     print('I am graphql Task')
-    return {'werk':'it'}
+    return {'werk':[a1,a2]}
+
+@app.task(bind=True,base=LogErrorsTask)
+def resolve_all_task(self,kwargs,left_index):
+
+    filter_query = kwargs['filter'] if 'filter' in kwargs else {}
+    res = resolve_with_join(filter_query,left_index)
+        
+    return res

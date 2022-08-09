@@ -1,6 +1,8 @@
 from graphene import InputObjectType, ObjectType, String, Field,ID, relay, List
 from graphene.relay import Connection,Node
 
+from graphql_api.tasks import resolve_all_task
+
 from .dataloader import AnalysisLoader
 
 from ..helpers import resolve_all, resolve_single_document, resolve_with_join
@@ -83,9 +85,10 @@ class AnalysisSchema(ObjectType):
         return resolve_single_analysis(args)
 
     def resolve_all_analysis(root, info,**kwargs):
-        filter_query = kwargs['filter'] if 'filter' in kwargs else {}
-        res = resolve_with_join(filter_query,'analysis')
-        return res
+        
+        task = resolve_all_task.apply_async(args=[kwargs,'analysis'],queue='graphql_api')
+        response = {'id':task.id,'status':task.status,'result':task.result}
+        return response
 
     # just an example of relay.connection field and batch loader
     def resolve_some_analysis(root,info,**args):
