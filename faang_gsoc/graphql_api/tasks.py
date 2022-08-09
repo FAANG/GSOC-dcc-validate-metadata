@@ -6,6 +6,7 @@ from celery.utils.log import get_task_logger
 from celery.signals import after_setup_logger
 import logging
 import os.path
+import time
 
 APP_PATH = os.path.dirname(os.path.realpath(__file__))
 logger = get_task_logger(__name__)
@@ -29,6 +30,6 @@ class LogErrorsTask(Task):
 
 @app.task(base=LogErrorsTask)
 def graphql_task():
-    # time.sleep(5)
+    time.sleep(20)
     print('I am graphql Task')
-    return 'Hi!!!'
+    return {'werk':'it'}
