@@ -9,6 +9,12 @@ from celery.signals import after_setup_logger
 import logging
 import os.path
 import time
+import channels.layers
+
+from asgiref.sync import async_to_sync
+
+channel_layer = channels.layers.get_channel_layer()
+
 
 APP_PATH = os.path.dirname(os.path.realpath(__file__))
 logger = get_task_logger(__name__)
@@ -30,14 +36,15 @@ class LogErrorsTask(Task):
                      errors=f'There is a problem with the conversion process. Error: {exc}')
 
 
-@app.task(base=LogErrorsTask)
-def graphql_task(a1,a2):
-    print('I am graphql Task')
-    return {'werk':[a1,a2]}
+@app.task(bind=True,base=LogErrorsTask)
+def graphql_task(self,a1,a2):
+    time.sleep(5)
+    res = {'werk':[a1,a2]}
+    async_to_sync(channel_layer.send)('_'.join(self.request.id.__str__().split('-')),{'type':'task_result','response':'hello'})
+    return res
 
 @app.task(bind=True,base=LogErrorsTask)
 def resolve_all_task(self,kwargs,left_index):
-
     filter_query = kwargs['filter'] if 'filter' in kwargs else {}
     res = resolve_with_join(filter_query,left_index)
         

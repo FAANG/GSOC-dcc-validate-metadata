@@ -1,5 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
+import time
 
 class SubmissionConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -38,7 +39,7 @@ class SubmissionConsumer(AsyncWebsocketConsumer):
         )
 
     # Receive message from room group
-    async def submission_message(self, event):
+    async def task_result(self, event):
         message = event['response']
 
         # Send message to WebSocket
@@ -59,6 +60,9 @@ class GraphQLTaskStatusConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
+
+        time.sleep(5)
+        
 
         await self.accept()
 
@@ -86,7 +90,7 @@ class GraphQLTaskStatusConsumer(AsyncWebsocketConsumer):
     # Receive message from room group
     async def submission_message(self, event):
         message = event['response']
-
+        print(message)
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'response': message
