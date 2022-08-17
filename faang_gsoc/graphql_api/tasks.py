@@ -1,5 +1,5 @@
 from faang_gsoc.celery import app
-from faang_gsoc.helpers import send_message
+from faang_gsoc.helpers import get_dummy_response, send_message, send_message_graphql
 from faang_gsoc.constants import ALLOWED_TEMPLATES
 from graphql_api.grapheneObjects.helpers import resolve_with_join
 
@@ -40,8 +40,8 @@ class LogErrorsTask(Task):
 def graphql_task(self,a1,a2):
     time.sleep(5)
     res = {'werk':[a1,a2]}
-    async_to_sync(channel_layer.send)('_'.join(self.request.id.__str__().split('-')),{'type':'task_result','response':'hello'})
-    return res
+    send_message_graphql(self.request.id,res)
+    return get_dummy_response()
 
 @app.task(bind=True,base=LogErrorsTask)
 def resolve_all_task(self,kwargs,left_index):

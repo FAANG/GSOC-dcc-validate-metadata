@@ -39,7 +39,7 @@ class SubmissionConsumer(AsyncWebsocketConsumer):
         )
 
     # Receive message from room group
-    async def task_result(self, event):
+    async def submission_message(self, event):
         message = event['response']
 
         # Send message to WebSocket
@@ -51,8 +51,10 @@ class SubmissionConsumer(AsyncWebsocketConsumer):
 class GraphQLTaskStatusConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['task_id']
+        # self.room_name = 'graphql_room'
         print(self.room_name)
         self.room_group_name = 'graphqltaskstatus_%s' % self.room_name
+        # self.room_group_name = 'graphql_group_room'
         print(self.room_group_name)
 
         # Join room group
@@ -60,9 +62,6 @@ class GraphQLTaskStatusConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-
-        time.sleep(5)
-        
 
         await self.accept()
 
@@ -82,13 +81,13 @@ class GraphQLTaskStatusConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             self.room_group_name,
             {
-                'type': 'submission_message',
+                'type': 'graphql_task_result',
                 'response': message
             }
         )
 
     # Receive message from room group
-    async def submission_message(self, event):
+    async def graphql_task_result(self, event):
         message = event['response']
         print(message)
         # Send message to WebSocket
