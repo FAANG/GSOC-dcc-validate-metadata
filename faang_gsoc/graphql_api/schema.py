@@ -1,8 +1,6 @@
 from graphene import Schema, String,relay, ObjectType, Field
 
-from faang_gsoc.helpers import send_message_graphql
 from .tasks import graphql_task
-from .grapheneObjects.helpers import resolve_all
 
 from .grapheneObjects.organism.schema import OrganismSchema
 from .grapheneObjects.analysis.schema import AnalysisSchema
@@ -15,8 +13,6 @@ from .grapheneObjects.protocol_analysis.schema import ProtocolAnalysisSchema
 from .grapheneObjects.protocol_samples.schema import ProtocolSamplesSchema
 from .grapheneObjects.protocol_files.schema import ProtocolFilesSchema
 
-from django.http import HttpResponse
-import json
 class HelloObject(ObjectType):
     id = String()
     status = String()
