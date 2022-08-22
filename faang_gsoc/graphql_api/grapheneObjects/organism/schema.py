@@ -85,7 +85,7 @@ class OrganismSchema(ObjectType):
     organism = Field(OrganismNode,id = ID(required=True), alternate_id = ID(required = False))
     # all_organism = relay.ConnectionField(OrganismConnection,filter=MyInputObjectType())
     all_organisms = relay.ConnectionField(OrganismConnection,filter=OrganismFilter_Argument())
-    all_organisms_as_task = Field(TaskResponse)
+    all_organisms_as_task = Field(TaskResponse,filter=OrganismFilter_Argument())
     all_organisms_task_result = relay.ConnectionField(OrganismConnection,filter=OrganismFilter_Argument(),task_id=String())
 
     # just an example of relay.connection field and batch loader
