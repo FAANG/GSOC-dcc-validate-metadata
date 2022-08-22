@@ -50,10 +50,10 @@ class SubmissionConsumer(AsyncWebsocketConsumer):
 
 class GraphQLTaskStatusConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['task_id']
+        self.room_name = '-'.join(self.scope['url_route']['kwargs']['task_id'].split('_'))
         # self.room_name = 'graphql_room'
         print(self.room_name)
-        self.room_group_name = 'graphqltaskstatus_%s' % self.room_name
+        self.room_group_name = 'graphqltaskstatus-%s' % self.room_name
         # self.room_group_name = 'graphql_group_room'
         print(self.room_group_name)
 

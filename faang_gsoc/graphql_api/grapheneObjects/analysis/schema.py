@@ -8,7 +8,7 @@ from .dataloader import AnalysisLoader
 from ..helpers import resolve_all, resolve_single_document, resolve_with_join
 from .fieldObjects import AnalysisDate_Field, AnalysisJoin_Field,Files_Field,AnalysisOrganism_Field
 from .arguments.filter import AnalysisFilter_Argument
-from ..commonFieldObjects import Protocol_Field
+from ..commonFieldObjects import Protocol_Field, TaskResponse
 def resolve_single_analysis(args):
     q = ''
 
@@ -77,7 +77,7 @@ class AnalysisSchema(ObjectType):
     analysis = Field(AnalysisNode,id = ID(required=True), alternate_id = ID(required = False))
     # all_analysis = relay.ConnectionField(AnalysisConnection,filter=MyInputObjectType())
     all_analysis = relay.ConnectionField(AnalysisConnection,filter=AnalysisFilter_Argument())
-
+    all_analysis_as_task = Field(TaskResponse)
     # just an example of relay.connection field and batch loader
     some_analysis = relay.ConnectionField(AnalysisConnection,ids = List(of_type=String, required=True))
 
@@ -86,9 +86,16 @@ class AnalysisSchema(ObjectType):
 
     def resolve_all_analysis(root, info,**kwargs):
         
+        filter_query = kwargs['filter'] if 'filter' in kwargs else {}
+        res = resolve_with_join(filter_query,'analyis')
+        return res
+
+    def resolve_all_analysis_as_task(root, info,**kwargs):
+        
         task = resolve_all_task.apply_async(args=[kwargs,'analysis'],queue='graphql_api')
         response = {'id':task.id,'status':task.status,'result':task.result}
         return response
+
 
     # just an example of relay.connection field and batch loader
     def resolve_some_analysis(root,info,**args):
@@ -98,3 +105,4 @@ class AnalysisSchema(ObjectType):
         
         return res 
         
+    

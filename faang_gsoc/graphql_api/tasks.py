@@ -45,7 +45,12 @@ def graphql_task(self,a1,a2):
 
 @app.task(bind=True,base=LogErrorsTask)
 def resolve_all_task(self,kwargs,left_index):
+    time.sleep(2)
+    send_message_graphql(self.request.id,'task received')    
     filter_query = kwargs['filter'] if 'filter' in kwargs else {}
     res = resolve_with_join(filter_query,left_index)
-        
+    # res = {'data':[{'biosampleId':'SAMEA1','name':'O1'},{'biosampleId':'SAMEA2','name':'O2'}]}
+    send_message_graphql(self.request.id,'task finished')    
+
+    
     return res

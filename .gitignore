@@ -32,3 +32,4 @@ activate.bat
 data.json
 todo.txt
 sampleData
+faang_gsoc/.env

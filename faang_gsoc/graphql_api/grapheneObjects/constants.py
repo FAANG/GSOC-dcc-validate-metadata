@@ -87,4 +87,4 @@ FAANG_dataset_index_relations = {
 
 }
 
-non_keyword_properties = set({'organism.text','libraryPreparationDate.text',"_id"})
+non_keyword_properties = set({'organism.text','organism.biosampleId','libraryPreparationDate.text',"_id"})

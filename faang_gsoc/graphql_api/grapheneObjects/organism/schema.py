@@ -1,11 +1,19 @@
 from graphene import ObjectType, String, Field,ID, relay, List, Int
 from graphene.relay import Connection,Node
 
+from ..commonFieldObjects import TaskResponse
+
+from ...tasks import resolve_all_task
+
 from .dataloader import OrganismLoader
 
 from ..helpers import resolve_all, resolve_with_join, resolve_single_document
 from .fieldObjects import Organism_Field,OrganismCustomField_Field,BirthDate_Field,BirthLocationLatitude_Field,BirthLocationLongitude_Field,BirthWeight_Field,Breed_Field,HealthStatus_Field,Material_Field,FileOrganization_Field,PlacentalWeight_Field,PregnancyLength_Field,OrganismPublishedArticles_Field,Sex_Field, OrganismJoin_Field
 from .arguments.filter import OrganismFilter_Argument
+
+from celery.result import AsyncResult
+
+
 def resolve_single_organism(args):
     q = ''
 
@@ -77,6 +85,8 @@ class OrganismSchema(ObjectType):
     organism = Field(OrganismNode,id = ID(required=True), alternate_id = ID(required = False))
     # all_organism = relay.ConnectionField(OrganismConnection,filter=MyInputObjectType())
     all_organisms = relay.ConnectionField(OrganismConnection,filter=OrganismFilter_Argument())
+    all_organisms_as_task = Field(TaskResponse)
+    all_organisms_task_result = relay.ConnectionField(OrganismConnection,filter=OrganismFilter_Argument(),task_id=String())
 
     # just an example of relay.connection field and batch loader
     some_organisms = relay.ConnectionField(OrganismConnection,ids = List(of_type=String, required=True))
@@ -88,6 +98,17 @@ class OrganismSchema(ObjectType):
         filter_query = kwargs['filter'] if 'filter' in kwargs else {}
         res = resolve_with_join(filter_query,'organism')
         return res
+
+    def resolve_all_organisms_as_task(root, info,**kwargs):
+        
+        task = resolve_all_task.apply_async(args=[kwargs,'organism'],queue='graphql_api')
+        response = {'id':task.id,'status':task.status,'result':task.result}
+        return response
+
+    def resolve_all_organisms_task_result(root,info, **kwargs):
+        task_id = kwargs['task_id']
+        res = AsyncResult(task_id).result
+        return res if res else []
 
     # just an example of relay.connection field and batch loader
     def resolve_some_organisms(root,info,**args):

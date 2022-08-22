@@ -10,3 +10,7 @@ class TextUnit_Field(ObjectType):
 class Protocol_Field(ObjectType):
     url = String()
     filename = String()
+
+class TaskResponse(ObjectType):
+    id = String()
+    status = String()
