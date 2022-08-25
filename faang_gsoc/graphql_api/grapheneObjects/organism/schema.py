@@ -1,5 +1,8 @@
 from graphene import ObjectType, String, Field,ID, relay, List, Int
 from graphene.relay import Connection,Node
+from graphql_api.tasks import resolve_all_task
+from celery.result import AsyncResult
+
 
 from ..commonFieldObjects import TaskResponse
 
@@ -86,7 +89,7 @@ class OrganismSchema(ObjectType):
     # all_organism = relay.ConnectionField(OrganismConnection,filter=MyInputObjectType())
     all_organisms = relay.ConnectionField(OrganismConnection,filter=OrganismFilter_Argument())
     all_organisms_as_task = Field(TaskResponse,filter=OrganismFilter_Argument())
-    all_organisms_task_result = relay.ConnectionField(OrganismConnection,filter=OrganismFilter_Argument(),task_id=String())
+    all_organisms_task_result = relay.ConnectionField(OrganismConnection,task_id=String())
 
     # just an example of relay.connection field and batch loader
     some_organisms = relay.ConnectionField(OrganismConnection,ids = List(of_type=String, required=True))

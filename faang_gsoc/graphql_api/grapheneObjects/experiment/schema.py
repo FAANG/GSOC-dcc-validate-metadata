@@ -1,12 +1,16 @@
 from graphene import ObjectType, String, Field,ID, relay, List
 from graphene.relay import Connection,Node
+from graphql_api.tasks import resolve_all_task
+from celery.result import AsyncResult
+
 
 from .dataloader import ExperimentLoader
 
 from ..helpers import resolve_single_document, resolve_with_join
 from .fieldObjects import ATAC_seq_Field,BS_seq_Field,CAGE_seq_Field,ChIP_seq_DNA_binding_Field,ChIP_seq_input_DNA_Field,DNase_seq_Field,ExperimentCustomField_Field,ExperimentJoin_Field,Hi_C_Field,RNA_seq_Field,WGS_Field
 from .arguments.filter import ExperimentFilter_Argument
-from ..commonFieldObjects import Protocol_Field, TextUnit_Field
+from ..commonFieldObjects import Protocol_Field, TextUnit_Field, TaskResponse
+
 def resolve_single_experiment(args):
     q = ''
 
@@ -89,6 +93,8 @@ class ExperimentSchema(ObjectType):
     experiment = Field(ExperimentNode,id = ID(required=True), alternate_id = ID(required = False))
     all_experiments = relay.ConnectionField(ExperimentConnection, filter=ExperimentFilter_Argument())
 
+    all_experiments_as_task = Field(TaskResponse,filter=ExperimentFilter_Argument())
+    all_experiments_task_result = relay.ConnectionField(ExperimentConnection,task_id=String())
     # just an example of relay.connection field and batch loader
     some_experiments = relay.ConnectionField(ExperimentConnection,ids = List(of_type=String, required=True))
 
@@ -99,6 +105,17 @@ class ExperimentSchema(ObjectType):
         filter_query = kwargs['filter'] if 'filter' in kwargs else {}
         res = resolve_with_join(filter_query,'experiment')
         return res
+
+    def resolve_all_experiments_as_task(root, info,**kwargs):
+        
+        task = resolve_all_task.apply_async(args=[kwargs,'experiment'],queue='graphql_api')
+        response = {'id':task.id,'status':task.status,'result':task.result}
+        return response
+
+    def resolve_all_experiments_task_result(root,info, **kwargs):
+        task_id = kwargs['task_id']
+        res = AsyncResult(task_id).result
+        return res if res else []
 
     # just an example of relay.connection field and batch loader
     def resolve_some_experiments(root,info,**args):

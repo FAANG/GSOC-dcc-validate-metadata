@@ -1,11 +1,16 @@
 from graphene import InputObjectType, ObjectType, String, Field,ID, relay, List
 from graphene.relay import Connection,Node
+from graphql_api.tasks import resolve_all_task
+from celery.result import AsyncResult
+
 
 from .dataloader import ProtocolFilesLoader
 
 from ..helpers import resolve_all, resolve_single_document, resolve_with_join
 from .fieldObjects import Experiments_Field, ProtocolFilesJoin_Field
 from .arguments.filter import ProtocolFilesFilter_Argument
+from ..commonFieldObjects import TaskResponse
+
 def resolve_single_protocol_file(args):
     q = ''
 
@@ -53,6 +58,8 @@ class ProtocolFilesSchema(ObjectType):
     # all_protocol_files = relay.ConnectionField(ProtocolFilesConnection,filter=MyInputObjectType())
     all_protocol_files = relay.ConnectionField(ProtocolFilesConnection,filter=ProtocolFilesFilter_Argument())
 
+    all_protocol_files_as_task = Field(TaskResponse,filter=ProtocolFilesFilter_Argument())
+    all_protocol_files_task_result = relay.ConnectionField(ProtocolFilesConnection,task_id=String())
     # just an example of relay.connection field and batch loader
     some_protocol_files = relay.ConnectionField(ProtocolFilesConnection,ids = List(of_type=String, required=True))
 
@@ -63,6 +70,17 @@ class ProtocolFilesSchema(ObjectType):
         filter_query = kwargs['filter'] if 'filter' in kwargs else {}
         res = resolve_with_join(filter_query,'protocol_files')
         return res
+
+    def resolve_all_protocol_files_as_task(root, info,**kwargs):
+        
+        task = resolve_all_task.apply_async(args=[kwargs,'protocol_files'],queue='graphql_api')
+        response = {'id':task.id,'status':task.status,'result':task.result}
+        return response
+
+    def resolve_all_protocol_files_task_result(root,info, **kwargs):
+        task_id = kwargs['task_id']
+        res = AsyncResult(task_id).result
+        return res if res else []
 
     # just an example of relay.connection field and batch loader
     def resolve_some_protocol_files(root,info,**args):

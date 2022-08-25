@@ -1,11 +1,16 @@
 from graphene import InputObjectType, ObjectType, String, Field,ID, relay, List
 from graphene.relay import Connection,Node
+from graphql_api.tasks import resolve_all_task
+from celery.result import AsyncResult
+
 
 from .dataloader import FileLoader
 
 from ..helpers import getFileIndexPrimaryKeyFromName, resolve_all, resolve_single_document, resolve_with_join
 from .fieldObjects import FileExperiment_Field,FileJoin_Field,FilePublishedArticles_Field,Run_Field,Species_Field,Study_Field
 from .arguments.filter import FileFilter_Argument
+from ..commonFieldObjects import TaskResponse
+
 
 def resolve_single_file(args):
     q = ''
@@ -71,6 +76,8 @@ class FileSchema(ObjectType):
     # all_file = relay.ConnectionField(FileConnection,filter=MyInputObjectType())
     all_files = relay.ConnectionField(FileConnection,filter=FileFilter_Argument())
 
+    all_files_as_task = Field(TaskResponse,filter=FileFilter_Argument())
+    all_files_task_result = relay.ConnectionField(FileConnection,task_id=String())
     # just an example of relay.connection field and batch loader
     some_files = relay.ConnectionField(FileConnection,ids = List(of_type=String, required=True))
 
@@ -81,6 +88,17 @@ class FileSchema(ObjectType):
         filter_query = kwargs['filter'] if 'filter' in kwargs else {}
         res = resolve_with_join(filter_query,'file')
         return res
+
+    def resolve_all_files_as_task(root, info,**kwargs):
+        
+        task = resolve_all_task.apply_async(args=[kwargs,'file'],queue='graphql_api')
+        response = {'id':task.id,'status':task.status,'result':task.result}
+        return response
+
+    def resolve_all_files_task_result(root,info, **kwargs):
+        task_id = kwargs['task_id']
+        res = AsyncResult(task_id).result
+        return res if res else []
 
     # just an example of relay.connection field and batch loader
     def resolve_some_files(root,info,**args):

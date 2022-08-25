@@ -1,12 +1,15 @@
 from graphene import InputObjectType, ObjectType, String, Field,ID, relay, List
 from graphene.relay import Connection,Node
+from graphql_api.tasks import resolve_all_task
+from celery.result import AsyncResult
+
 
 from .dataloader import DatasetLoader
 
 from ..helpers import resolve_all, resolve_single_document, resolve_with_join
 from .fieldObjects import DatasetJoin_Field,DatasetExperiment_Field,File_Field,DatasetPublishedArticles_Field,Specimen_Field
 from .arguments.filter import DatasetFilter_Argument
-from ..commonFieldObjects import TextOntology_Field
+from ..commonFieldObjects import TextOntology_Field, TaskResponse
 def resolve_single_dataset(args):
     q = ''
 
@@ -67,6 +70,8 @@ class DatasetSchema(ObjectType):
     # all_dataset = relay.ConnectionField(DatasetConnection,filter=MyInputObjectType())
     all_datasets = relay.ConnectionField(DatasetConnection,filter=DatasetFilter_Argument())
 
+    all_datasets_as_task = Field(TaskResponse,filter=DatasetFilter_Argument())
+    all_datasets_task_result = relay.ConnectionField(DatasetConnection,task_id=String())
     # just an example of relay.connection field and batch loader
     some_datasets = relay.ConnectionField(DatasetConnection,ids = List(of_type=String, required=True))
 
@@ -77,6 +82,17 @@ class DatasetSchema(ObjectType):
         filter_query = kwargs['filter'] if 'filter' in kwargs else {}
         res = resolve_with_join(filter_query,'dataset')
         return res
+
+    def resolve_all_datasets_as_task(root, info,**kwargs):
+        
+        task = resolve_all_task.apply_async(args=[kwargs,'dataset'],queue='graphql_api')
+        response = {'id':task.id,'status':task.status,'result':task.result}
+        return response
+
+    def resolve_all_datasets_task_result(root,info, **kwargs):
+        task_id = kwargs['task_id']
+        res = AsyncResult(task_id).result
+        return res if res else []
 
     # just an example of relay.connection field and batch loader
     def resolve_some_datasets(root,info,**args):

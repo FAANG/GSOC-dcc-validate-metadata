@@ -1,7 +1,7 @@
 from graphene import InputObjectType, ObjectType, String, Field,ID, relay, List
 from graphene.relay import Connection,Node
-
 from graphql_api.tasks import resolve_all_task
+from celery.result import AsyncResult
 
 from .dataloader import AnalysisLoader
 
@@ -9,6 +9,7 @@ from ..helpers import resolve_all, resolve_single_document, resolve_with_join
 from .fieldObjects import AnalysisDate_Field, AnalysisJoin_Field,Files_Field,AnalysisOrganism_Field
 from .arguments.filter import AnalysisFilter_Argument
 from ..commonFieldObjects import Protocol_Field, TaskResponse
+
 def resolve_single_analysis(args):
     q = ''
 
@@ -77,7 +78,8 @@ class AnalysisSchema(ObjectType):
     analysis = Field(AnalysisNode,id = ID(required=True), alternate_id = ID(required = False))
     # all_analysis = relay.ConnectionField(AnalysisConnection,filter=MyInputObjectType())
     all_analysis = relay.ConnectionField(AnalysisConnection,filter=AnalysisFilter_Argument())
-    all_analysis_as_task = Field(TaskResponse)
+    all_analysis_as_task = Field(TaskResponse,filter=AnalysisFilter_Argument())
+    all_analysis_task_result = relay.ConnectionField(AnalysisConnection,task_id=String())
     # just an example of relay.connection field and batch loader
     some_analysis = relay.ConnectionField(AnalysisConnection,ids = List(of_type=String, required=True))
 
@@ -95,6 +97,11 @@ class AnalysisSchema(ObjectType):
         task = resolve_all_task.apply_async(args=[kwargs,'analysis'],queue='graphql_api')
         response = {'id':task.id,'status':task.status,'result':task.result}
         return response
+
+    def resolve_all_analysis_task_result(root,info, **kwargs):
+        task_id = kwargs['task_id']
+        res = AsyncResult(task_id).result
+        return res if res else []
 
 
     # just an example of relay.connection field and batch loader

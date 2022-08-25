@@ -58,8 +58,8 @@ def sanitize_filter_basic_query(filter_basic_query,sanitized_filter_basic_querie
         if isinstance(filter_basic_query[key],dict):
             sanitize_filter_basic_query(filter_basic_query[key],sanitized_filter_basic_queries,sanitized_key)
         else:
-            if sanitized_key not in non_keyword_properties:
-                sanitized_key += '.keyword'
+            # if sanitized_key not in non_keyword_properties:
+            #     sanitized_key += '.keyword'
             sanitized_filter_basic_queries.append({"terms":{sanitized_key : filter_basic_query[key]}})
 
 

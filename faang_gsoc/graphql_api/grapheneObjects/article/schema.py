@@ -1,11 +1,15 @@
 from graphene import ObjectType, String, Field,ID, relay, List
 from graphene.relay import Connection,Node
+from graphql_api.tasks import resolve_all_task
+from celery.result import AsyncResult
+
 
 from .dataloader import ArticleLoader
 
 from ..helpers import resolve_all, resolve_single_document, resolve_with_join, sanitize_filter_basic_query
 from .fieldObjects import RelatedDatasets_Field,ArticleJoin_Field
 from .arguments.filter import ArticleFilter_Argument
+from ..commonFieldObjects import TaskResponse
 
 def resolve_single_article(args):
     return resolve_single_document('article',args['id'],['pmcId','pubmedId'])
@@ -48,6 +52,8 @@ class ArticleSchema(ObjectType):
     # all_article = relay.ConnectionField(ArticleConnection,filter=MyInputObjectType())
     all_articles = relay.ConnectionField(ArticleConnection,filter=ArticleFilter_Argument())
 
+    all_articles_as_task = Field(TaskResponse,filter=ArticleFilter_Argument())
+    all_articles_task_result = relay.ConnectionField(ArticleConnection,task_id=String())
     # just an example of relay.connection field and batch loader
     some_articles = relay.ConnectionField(ArticleConnection,ids = List(of_type=String, required=True))
 
@@ -58,6 +64,17 @@ class ArticleSchema(ObjectType):
         filter_query = kwargs['filter'] if 'filter' in kwargs else {}
         res = resolve_with_join(filter_query,'article')
         return res
+
+    def resolve_all_articles_as_task(root, info,**kwargs):
+        
+        task = resolve_all_task.apply_async(args=[kwargs,'article'],queue='graphql_api')
+        response = {'id':task.id,'status':task.status,'result':task.result}
+        return response
+
+    def resolve_all_articles_task_result(root,info, **kwargs):
+        task_id = kwargs['task_id']
+        res = AsyncResult(task_id).result
+        return res if res else []
 
     # just an example of relay.connection field and batch loader
     def resolve_some_articles(root,info,**args):
