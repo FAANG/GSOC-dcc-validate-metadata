@@ -6,7 +6,6 @@ class Specimen_InputField(InputObjectType):
     biosampleId = List(String)
     material = Field(TextOntology_InputField)
     cellType = Field(TextOntology_InputField)
-    organism = Field(TextOntology_InputField)
     sex = Field(TextOntology_InputField)
     breed = Field(TextOntology_InputField)
 
@@ -64,7 +63,6 @@ class DatasetFilterJoin_Argument(InputObjectType):
     experiment = Field('graphql_api.grapheneObjects.experiment.arguments.filter.ExperimentFilter_Argument')
     article = Field('graphql_api.grapheneObjects.article.arguments.filter.ArticleFilter_Argument')
     analysis = Field('graphql_api.grapheneObjects.analysis.arguments.filter.AnalysisFilter_Argument')
-    organism = Field('graphql_api.grapheneObjects.organism.arguments.filter.OrganismFilter_Argument')
     specimen = Field('graphql_api.grapheneObjects.specimen.arguments.filter.SpecimenFilter_Argument')
     file = Field('graphql_api.grapheneObjects.file.arguments.filter.FileFilter_Argument')
     

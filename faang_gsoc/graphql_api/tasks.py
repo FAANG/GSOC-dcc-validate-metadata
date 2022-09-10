@@ -43,14 +43,18 @@ def graphql_task(self,a1,a2):
     send_message_graphql(self.request.id,res)
     return get_dummy_response()
 
-@app.task(bind=True,base=LogErrorsTask)
+class CallbackTask(LogErrorsTask):
+    def on_success(self, retval, task_id, args, kwargs):
+        send_message_graphql(task_id,'task finished')
+
+@app.task(bind=True,base=CallbackTask)
 def resolve_all_task(self,kwargs,left_index):
     time.sleep(2)
     send_message_graphql(self.request.id,'task received')    
     filter_query = kwargs['filter'] if 'filter' in kwargs else {}
     res = resolve_with_join(filter_query,left_index)
     # res = {'data':[{'biosampleId':'SAMEA1','name':'O1'},{'biosampleId':'SAMEA2','name':'O2'}]}
-    send_message_graphql(self.request.id,'task finished')    
+    send_message_graphql(self.request.id,'task about to finish')    
 
     
     return res

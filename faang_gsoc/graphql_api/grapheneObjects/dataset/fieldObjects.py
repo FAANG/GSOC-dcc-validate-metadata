@@ -40,7 +40,6 @@ class DatasetJoin_Field(ObjectType):
     experiment = relay.ConnectionField('graphql_api.grapheneObjects.experiment.schema.ExperimentConnection')
     article = relay.ConnectionField('graphql_api.grapheneObjects.article.schema.ArticleConnection')
     analysis = relay.ConnectionField('graphql_api.grapheneObjects.analysis.schema.AnalysisConnection')
-    organism = relay.ConnectionField('graphql_api.grapheneObjects.organism.schema.OrganismConnection')
     specimen = relay.ConnectionField('graphql_api.grapheneObjects.specimen.schema.SpecimenConnection')
     file = relay.ConnectionField('graphql_api.grapheneObjects.file.schema.FileConnection')
     
