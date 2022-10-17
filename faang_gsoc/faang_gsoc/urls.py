@@ -25,5 +25,6 @@ urlpatterns = [
     path('validation/', include('validation.urls')),
     path('submission/', include('submission.urls')),
     path(r'api-token-auth/', obtain_jwt_token),
-    path(r'api-token-refresh/', refresh_jwt_token)
+    path(r'api-token-refresh/', refresh_jwt_token),
+    path('subscriptions/',include('graphql_api.urls')),
 ]

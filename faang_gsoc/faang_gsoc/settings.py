@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,12 +20,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j201t-eu#6v1d_@nh1msnp7t9k7q@7+25-xbkn+0_9z+th$_a+'
+SECRET_KEY = config("SECRET_KEY","")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False if config("DEBUG") == "False" else True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['127.0.0.1','localhost','45.88.81.159']
+ALLOWED_HOSTS = ['*',]
 
 
 # Application definition
@@ -37,14 +38,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'channels',
     'ws',
+    'rest_framework',
+    'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl_drf',
+    'graphql_ws.django',
+    'graphene_django',
+    'graphql_api',
     'nextflow_upload',
     'conversion',
     'validation'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,6 +62,24 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# CORS_ALLOWED_ORIGINS = ['http://localhost:4200']
+CORS_ALLOW_ALL_ORIGINS = True
+# CSRF_COOKIE_SECURE = False
+GRAPHENE = {
+    "SCHEMA": "graphql_api.schema.schema"
+}
+
+ELASTICSEARCH_HOST = config("ELASTICSEARCH_HOST",default="localhost")
+ELASTICSEARCH_PORT = config("ELASTICSEARCH_PORT","9200")
+ELASTICSEARCH_NODE_URL = f'{ELASTICSEARCH_HOST}:{ELASTICSEARCH_PORT}'
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': ELASTICSEARCH_NODE_URL
+    },
+}
+
 
 ROOT_URLCONF = 'faang_gsoc.urls'
 
@@ -129,24 +156,40 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# redis url
+REDIS_HOST = config("REDIS_HOST","localhost")
+REDIS_PORT = config("REDIS_PORT","6379")
+REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+
+# amqp url
+AMQP_HOST = config("AMQP_HOST","localhost")
+AMQP_PORT = config("AMQP_PORT","5672")
+AMQP_URL = f"amqp://{AMQP_HOST}:{AMQP_PORT}"
+
+print(REDIS_HOST,AMQP_HOST)
+
 # celery setup
-CELERY_BROKER_URL = 'amqp://localhost'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_BROKER_URL = AMQP_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 
 ASGI_APPLICATION = 'faang_gsoc.routing.application'
+
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            # "hosts": [('127.0.0.1', 6379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
 
-BOVREG_BIOSAMPLES_USERNAME_PROD = 'bovreg_bio_username'
+
+BOVREG_BIOSAMPLES_USERNAME_PROD = 'bovreg_bio_uname'
 BOVREG_USERNAME = 'bovreg_uname'
 BOVREG_PASSWORD = 'bovreg_pwd'
 BOVREG_BIOSAMPLES_USERNAME_TEST = 'bovreg_bio_uname_test'
